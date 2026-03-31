@@ -1,0 +1,36 @@
+{
+  "name": "portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sanity/client": "latest",
+    "@sanity/code-input": "latest",
+    "@sanity/image-url": "latest",
+    "next": "latest",
+    "next-sanity": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-syntax-highlighter": "latest",
+    "sanity": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "autoprefixer": "^10.4.27",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.2",
+    "typescript": "latest"
+  }
+}

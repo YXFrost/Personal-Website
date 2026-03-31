@@ -1,0 +1,202 @@
+/* app/globals.css */
+/* ─────────────────────────────────────────────────────────────────
+   Global styles, CSS custom properties, and utility classes
+   Fonts are now loaded via next/font for better performance
+   ───────────────────────────────────────────────────────────────── */
+
+@import "tailwindcss";
+
+/* ── Tailwind v4 Theme Configuration ───────────────────────────── */
+@theme {
+  /* Colors - Prefixed with --color to enable bg-*, text-*, border-* */
+  --color-amber: #f5a623;
+  --color-amber-glow: rgba(245, 166, 35, 0.15);
+  --color-amber-dim: rgba(245, 166, 35, 0.06);
+  --color-amber-muted: #a87016;
+  
+  --color-void: #080808;
+  --color-surface: #0e0e0e;
+  --color-card: #141414;
+  --color-border: #1f1f1f;
+  
+  --color-text-primary: #f0ece0;
+  --color-text-secondary: #7a7570;
+  --color-text-muted: #3d3a35;
+
+  /* Animations */
+  --animate-fade-up: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-blink: blink 1.1s step-end infinite;
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+}
+
+/* ── Base Styles ─────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-void text-text-primary font-sans font-light;
+    overflow-x: hidden;
+  }
+}
+
+/* ── Selection Styling ─────────────────────────────────────────── */
+::selection {
+  background: var(--color-amber-glow);
+  color: var(--color-amber);
+}
+
+/* ── Custom Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-amber-muted);
+}
+
+/* ── Utility Classes ───────────────────────────────────────────── */
+@layer utilities {
+  /* Text glow effect */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(245, 166, 35, 0.4),
+                 0 0 40px rgba(245, 166, 35, 0.15);
+  }
+
+  /* Card hover glow effect */
+  .card-glow {
+    box-shadow: 0 0 0 1px rgba(245, 166, 35, 0),
+                0 8px 32px rgba(0, 0, 0, 0.6);
+    transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), 
+                transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  
+  .card-glow:hover {
+    box-shadow: 0 0 0 1px rgba(245, 166, 35, 0.25),
+                0 0 24px rgba(245, 166, 35, 0.08),
+                0 16px 48px rgba(0, 0, 0, 0.8);
+    transform: translateY(-4px);
+  }
+
+  /* Scanline overlay effect */
+  .scanlines::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Grid background pattern */
+  .bg-grid {
+    background-image: linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Manual delay classes */
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .delay-500 { animation-delay: 0.5s; }
+}
+
+/* ── Component Styles ──────────────────────────────────────────── */
+@layer components {
+  /* Tag pill component */
+  .tag-pill {
+    @apply inline-flex items-center font-mono text-[0.65rem] font-normal tracking-wider;
+    @apply px-2 py-1 rounded-sm;
+    @apply text-amber bg-amber/5 border border-amber/10;
+  }
+
+  /* Rich text prose styling */
+  .prose-dark {
+    @apply text-text-secondary leading-relaxed;
+  }
+  
+  .prose-dark p {
+    @apply mb-4;
+  }
+  
+  .prose-dark strong {
+    @apply text-text-primary font-medium;
+  }
+  
+  .prose-dark a {
+    @apply text-amber hover:text-amber-glow underline underline-offset-2;
+    @apply transition-colors duration-200;
+  }
+  
+  .prose-dark ul,
+  .prose-dark ol {
+    @apply ml-6 mb-4 space-y-2;
+  }
+  
+  .prose-dark li {
+    @apply text-text-secondary;
+  }
+  
+  .prose-dark code {
+    @apply font-mono text-sm bg-card px-1.5 py-0.5 rounded;
+    @apply text-amber/90 border border-border;
+  }
+
+  .prose-dark pre {
+    @apply bg-card border border-border rounded-sm p-4 overflow-x-auto;
+    @apply mb-4;
+  }
+
+  .prose-dark pre code {
+    @apply bg-transparent border-none p-0;
+  }
+}
+
+/* ── Focus Visible Styling ─────────────────────────────────────── */
+*:focus-visible {
+  @apply outline-none ring-2 ring-amber/50 ring-offset-2 ring-offset-void;
+}
+
+/* Remove focus ring for mouse users, keep for keyboard users */
+*:focus:not(:focus-visible) {
+  @apply outline-none ring-0;
+}
