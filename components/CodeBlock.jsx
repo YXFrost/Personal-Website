@@ -1,33 +1,15 @@
-"use client";
-
+// Render highlighting on the server; no syntax-highlighter JavaScript is shipped to readers.
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
-
 export default function CodeBlock({ value }) {
-  if (!value || !value.code) return null;
-
-  return (
-    <div className="my-8 rounded-lg overflow-hidden border border-border bg-[#1e1e1e] shadow-lg">
-      {/* Tab bar for the filename */}
-      {value.filename && (
-        <div className="px-4 py-2 bg-[#2d2d2d] text-text-secondary font-mono text-xs border-b border-text-muted">
-          {value.filename}
-        </div>
-      )}
-      
-      <SyntaxHighlighter
-        language={value.language || "text"}
-        style={vscDarkPlus}
-        customStyle={{
-          margin: 0,
-          padding: "1.5rem",
-          background: "transparent",
-          fontSize: "0.875rem",
-          fontFamily: "var(--font-mono), monospace",
-        }}
-      >
-        {value.code}
-      </SyntaxHighlighter>
-    </div>
-  );
+  if (!value?.code) return null;
+  return <figure className="code-figure">
+    {(value.filename || value.language) && <figcaption>{value.filename || value.language}</figcaption>}
+    <SyntaxHighlighter language={value.language || "text"} style={vscDarkPlus}
+      tabIndex={0} aria-label={`${value.language || "Plain text"} code sample`}
+      customStyle={{ margin: 0, background: "#181815", padding: "1.25rem", fontSize: "0.875rem" }}
+      codeTagProps={{ style: { fontFamily: "var(--mono)" } }}>
+      {value.code}
+    </SyntaxHighlighter>
+  </figure>;
 }

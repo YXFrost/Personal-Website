@@ -1,0 +1,191 @@
+[
+  {
+    "_id": "local-personal-website",
+    "_type": "project",
+    "title": "A home for ideas & things I build",
+    "slug": {
+      "current": "personal-website"
+    },
+    "summary": "This website: a personal publication, project portfolio, and archive of learning. Built with Next.js and Sanity, and editable from a normal Git repository.",
+    "technologies": ["Next.js", "React", "Sanity"],
+    "status": "In progress",
+    "publishedAt": "2026-09-20",
+    "featured": true,
+    "coverImage": {
+      "src": "/images/personal-website.png",
+      "width": 1200,
+      "height": 750,
+      "alt": "The website homepage with its amber I learn by building headline, Currently panel, and Writing, Projects, Progress, About navigation."
+    },
+    "body": [
+      {
+        "_type": "block",
+        "_key": "overview",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "overviews",
+            "text": "Overview",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "overview-text",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "overview-texts",
+            "text": "A personal website combining long-form writing, project documentation, and progress notes. The visual language keeps a near-black background, warm amber accents, and the feel of a technical notebook.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "motivation",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "motivations",
+            "text": "Motivation",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "motivation-text",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "motivation-texts",
+            "text": "A monthly update archive can record what happened, but writing and projects need space of their own. This site gives each kind of work a clear home, while keeping the learning archive close by.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "process",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "processs",
+            "text": "Technical decisions",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "process-text",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "process-texts",
+            "text": "Next.js renders the content on the server. Sanity remains an optional editor, with local JSON files available for direct editing in VS Code. Rich text preserves headings, links, lists, images, code, tables, and mathematics.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "challenges",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "challengess",
+            "text": "Challenges",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "challenges-text",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "challenges-texts",
+            "text": "Long articles, wide code samples, and project screenshots need different layouts. Readable line lengths, contained scrolling, and image sizing let them share the same design system.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "result",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "results",
+            "text": "Result",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "result-text",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "result-texts",
+            "text": "Writing, Projects, Progress, and About are separate sections. The site remains a regular source-code project that can be edited, committed, and deployed independently.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "lessons",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "lessonss",
+            "text": "Lessons learned",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "lessons-text",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "lessons-texts",
+            "text": "Content models are part of the reading experience. A project needs room for process and outcomes; a progress log needs room for reflection; an essay needs room to develop an argument.",
+            "marks": []
+          }
+        ]
+      }
+    ]
+  }
+]
