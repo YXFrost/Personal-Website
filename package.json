@@ -1,36 +1,51 @@
 {
-  "name": "portfolio",
-  "version": "0.1.0",
+  "name": "yn-personal-site",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "lint": "eslint .",
+    "test": "node --test tests/content.test.mjs",
+    "test:browser": "node tests/run-browser.mjs",
+    "check": "npm run lint && npm test && npm run build",
+    "prebuild": "node scripts/prepare-math.mjs",
+    "predev": "node scripts/prepare-math.mjs"
   },
   "dependencies": {
-    "@sanity/client": "latest",
-    "@sanity/code-input": "latest",
-    "@sanity/image-url": "latest",
-    "next": "latest",
-    "next-sanity": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-syntax-highlighter": "latest",
-    "sanity": "latest"
+    "@portabletext/react": "8.0.1",
+    "@sanity/client": "8.6.2",
+    "@sanity/code-input": "7.3.8",
+    "@sanity/image-url": "2.1.1",
+    "katex": "^0.16.22",
+    "next": "16.3.5",
+    "next-sanity": "13.3.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "sanity": "6.15.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.2.2",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "1.55.1",
+    "@tailwindcss/postcss": "4.2.2",
     "autoprefixer": "^10.4.27",
-    "eslint": "latest",
-    "eslint-config-next": "latest",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^4.2.2",
-    "typescript": "latest"
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.3.5",
+    "postcss": "8.5.28",
+    "tailwindcss": "4.2.2"
+  },
+  "overrides": {
+    "adm-zip": "0.6.1",
+    "js-yaml": "3.15.2",
+    "smol-toml": "1.8.0",
+    "typeid-js": {
+      "uuid": "11.1.1"
+    }
   }
 }

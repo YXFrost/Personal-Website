@@ -1,0 +1,15 @@
+{
+  "name": "YN",
+  "description": "A student documenting what I learn, what I build, and the ideas I find worth exploring.",
+  "github": "",
+  "email": "",
+  "currently": {
+    "building": "A home for my writing and projects",
+    "exploring": "Connections between science, books, and technology",
+    "updated": "2026-09-20"
+  },
+  "about": [
+    "I’m a student with an interest in mathematics, physics, engineering, literature, economics, and philosophy. This is a place to bring those interests together.",
+    "I use this site to write through what I learn, document things I build, and keep a record of my progress. Some notes will be polished; others will still have questions in the margins."
+  ]
+}

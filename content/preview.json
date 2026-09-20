@@ -1,0 +1,432 @@
+[
+  {
+    "_id": "preview-legacy-project",
+    "_type": "project",
+    "title": "Legacy content compatibility specimen",
+    "slug": { "current": "legacy-compatibility" },
+    "description": "Fictional test of the original project schema, not a personal accomplishment.",
+    "tags": ["JavaScript"],
+    "_createdAt": "2026-09-01T00:00:00Z",
+    "image": { "src": "/images/personal-website.png", "width": 1200, "height": 750, "alt": "Website layout specimen" },
+    "liveUrl": "https://example.com/legacy-demo",
+    "longDescription": [
+      { "_type": "block", "_key": "legacy-h2", "style": "h2", "markDefs": [], "children": [{ "_type": "span", "_key": "s2", "marks": [], "text": "Legacy content" }] },
+      { "_type": "block", "_key": "legacy-h3", "style": "h3", "markDefs": [], "children": [{ "_type": "span", "_key": "s3", "marks": [], "text": "Original rich text" }] },
+      { "_type": "block", "_key": "legacy-h4", "style": "h4", "markDefs": [], "children": [{ "_type": "span", "_key": "s4", "marks": [], "text": "Nested heading support" }] },
+      { "_type": "block", "_key": "legacy-heading", "style": "h5", "markDefs": [], "children": [{ "_type": "span", "_key": "legacy-span", "marks": [], "text": "Original heading remains readable" }] },
+      { "_type": "block", "_key": "legacy-text", "style": "normal", "markDefs": [{ "_type": "link", "_key": "bad-link", "href": "javascript:alert(1)" }], "children": [{ "_type": "span", "_key": "underlined", "marks": ["underline"], "text": "Original underlined text. " }, { "_type": "span", "_key": "unsafe", "marks": ["bad-link"], "text": "Unsafe link rendered as text." }] },
+      { "_type": "code", "_key": "legacy-code", "language": "javascript", "filename": "legacy-example.js", "code": "const preserved = true;\nconsole.log(preserved);" },
+      { "_type": "image", "_key": "legacy-image", "src": "/images/personal-website.png", "width": 1200, "height": 750, "alt": "Inline website specimen", "caption": "Original inline image with an added caption." }
+    ]
+  },
+  {
+    "_id": "preview-writing",
+    "_type": "writing",
+    "title": "A question is a good place to begin",
+    "slug": {
+      "current": "reading-specimen"
+    },
+    "summary": "A layout specimen for essays: arguments, marginal questions, mathematics, code, and references. Demonstration content only.",
+    "publishedAt": "2026-09-01",
+    "category": "Notebook",
+    "tags": ["Reading", "Mathematics"],
+    "featured": true,
+    "body": [
+      {
+        "_type": "block",
+        "_key": "note",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "notes",
+            "text": "This is a layout specimen, not an essay by the site owner. Its only purpose is to exercise the renderer.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "q",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "qs",
+            "text": "Start with a question",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "q1",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "q1s",
+            "text": "A good note leaves room for uncertainty. Use a short opening paragraph to say what question the piece explores and why it is worth asking.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "quote",
+        "style": "blockquote",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "quotes",
+            "text": "Understanding takes time; the page can hold the question while we work.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "arg",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "args",
+            "text": "Follow the argument",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "format",
+        "style": "normal",
+        "markDefs": [
+          {
+            "_key": "source",
+            "_type": "link",
+            "href": "https://www.sanity.io/docs/portable-text"
+          }
+        ],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "a",
+            "text": "Rich text keeps ",
+            "marks": []
+          },
+          {
+            "_type": "span",
+            "_key": "b",
+            "text": "emphasis",
+            "marks": ["em"]
+          },
+          {
+            "_type": "span",
+            "_key": "c",
+            "text": ", ",
+            "marks": []
+          },
+          {
+            "_type": "span",
+            "_key": "d",
+            "text": "strong claims",
+            "marks": ["strong"]
+          },
+          {
+            "_type": "span",
+            "_key": "e",
+            "text": ", and ",
+            "marks": []
+          },
+          {
+            "_type": "span",
+            "_key": "f",
+            "text": "references",
+            "marks": ["source"]
+          },
+          {
+            "_type": "span",
+            "_key": "g",
+            "text": " intact. Inline code: ",
+            "marks": []
+          },
+          {
+            "_type": "span",
+            "_key": "h",
+            "text": "const question = true;",
+            "marks": ["code"]
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "l1",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "l1s",
+            "text": "State the claim.",
+            "marks": []
+          }
+        ],
+        "listItem": "bullet",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "l2",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "l2s",
+            "text": "Check the evidence.",
+            "marks": []
+          }
+        ],
+        "listItem": "bullet",
+        "level": 1
+      },
+      {
+        "_type": "block",
+        "_key": "l3",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "l3s",
+            "text": "Keep objections visible.",
+            "marks": []
+          }
+        ],
+        "listItem": "bullet",
+        "level": 2
+      },
+      {
+        "_type": "block",
+        "_key": "compare",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "compares",
+            "text": "Make comparisons visible",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "table",
+        "_key": "table",
+        "caption": "Example comparison table",
+        "rows": [
+          {
+            "_key": "r1",
+            "cells": ["Part", "Question", "Evidence", "Limits"]
+          },
+          {
+            "_key": "r2",
+            "cells": [
+              "Claim",
+              "What is proposed?",
+              "Text or observation",
+              "Scope of the claim"
+            ]
+          },
+          {
+            "_key": "r3",
+            "cells": [
+              "Objection",
+              "What might fail?",
+              "Counterexample",
+              "What remains unresolved"
+            ]
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "math-heading",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "math-headings",
+            "text": "Leave space for technical detail",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "inline",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "i1",
+            "text": "Inline mathematics stays with the sentence: ",
+            "marks": []
+          },
+          {
+            "_type": "inlineMath",
+            "_key": "i2",
+            "latex": "E = mc^2"
+          },
+          {
+            "_type": "span",
+            "_key": "i3",
+            "text": ". Display mathematics has a line of its own.",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "math",
+        "_key": "equation",
+        "latex": "\\int_0^1 x^2\\,dx = \\left[\\frac{x^3}{3}\\right]_0^1 = \\frac{1}{3}"
+      },
+      {
+        "_type": "code",
+        "_key": "code",
+        "language": "javascript",
+        "code": "// Deliberately wide: this block scrolls without widening the article.\nconst readingList = [\"mathematics\", \"physics\", \"economics\", \"philosophy\", \"literature\", \"engineering\", \"programming\"];\nconsole.log(readingList.join(\" \u00b7 \"));"
+      },
+      {
+        "_type": "image",
+        "_key": "fig",
+        "src": "/images/notebook.svg",
+        "width": 1200,
+        "height": 750,
+        "alt": "Abstract technical notebook layout used to test responsive article images.",
+        "caption": "Layout specimen: image dimensions are preserved."
+      },
+      {
+        "_type": "block",
+        "_key": "conclusion",
+        "style": "h2",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "conclusions",
+            "text": "Finish with the next question",
+            "marks": []
+          }
+        ]
+      },
+      {
+        "_type": "block",
+        "_key": "end",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "ends",
+            "text": "This specimen ends here. Replace demonstration content with your own work before publishing.",
+            "marks": []
+          }
+        ]
+      }
+    ],
+    "references": [
+      {
+        "title": "Portable Text documentation",
+        "url": "https://www.sanity.io/docs/portable-text",
+        "note": "Reference formatting example."
+      }
+    ]
+  },
+  {
+    "_id": "preview-writing-2",
+    "_type": "writing",
+    "title": "Notes from the margins",
+    "slug": {
+      "current": "margin-notes"
+    },
+    "summary": "A shorter example showing how small notes sit alongside long-form writing. Demonstration content only.",
+    "publishedAt": "2026-08-20",
+    "category": "Notebook",
+    "tags": ["Reading"],
+    "body": [
+      {
+        "_type": "block",
+        "_key": "short",
+        "style": "normal",
+        "markDefs": [],
+        "children": [
+          {
+            "_type": "span",
+            "_key": "shorts",
+            "text": "A short page should have room to breathe without an unnecessary table of contents. This is a demonstration entry.",
+            "marks": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "_id": "preview-progress",
+    "_type": "progress",
+    "title": "A month of questions",
+    "slug": {
+      "current": "sample-month"
+    },
+    "summary": "A fictional monthly log for testing statistics and reflection layouts. These are not the owner\u2019s study records.",
+    "publishedAt": "2026-09-01",
+    "month": "2026-08-01",
+    "studyHours": 42,
+    "subjects": ["Mathematics", "Literature"],
+    "milestones": ["Example milestone: complete a set of notes."],
+    "highlights": ["Example highlight: make a connection between two topics."],
+    "difficulties": ["Example difficulty: deciding what to prioritize."],
+    "reflections": [
+      "A statistic provides context; the reflection explains what it meant."
+    ],
+    "nextSteps": ["Replace all preview material with real entries."],
+    "body": []
+  },
+  {
+    "_id": "preview-gallery",
+    "_type": "project",
+    "title": "Project gallery specimen",
+    "slug": {
+      "current": "gallery-specimen"
+    },
+    "summary": "Demonstration content to verify responsive gallery images and captions.",
+    "publishedAt": "2026-08-01",
+    "status": "In progress",
+    "technologies": ["Example"],
+    "gallery": [
+      {
+        "src": "/images/notebook.svg",
+        "width": 1200,
+        "height": 750,
+        "alt": "Technical notebook composition.",
+        "caption": "A gallery image with its original aspect ratio."
+      },
+      {
+        "src": "/images/personal-website.png",
+        "width": 1200,
+        "height": 750,
+        "alt": "A screenshot of the personal website homepage.",
+        "caption": "A raster image to exercise the Next.js responsive image optimizer."
+      }
+    ],
+    "body": []
+  }
+]
