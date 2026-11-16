@@ -3,7 +3,7 @@ import { imageInfo } from "@/lib/images";
 import ImageLightbox from "./ImageLightbox";
 export default function ResponsiveImage({
   image,
-  priority = false,
+  eager = false,
   sizes = "(max-width: 768px) calc(100vw - 40px), 760px",
   className = "",
   decorative = false,
@@ -16,7 +16,7 @@ export default function ResponsiveImage({
       {...info}
       alt={decorative ? "" : image.alt || ""}
       sizes={sizes}
-      priority={priority}
+      loading={eager ? "eager" : "lazy"}
       className={className}
       style={{
         objectPosition: `${(image.hotspot?.x ?? 0.5) * 100}% ${(image.hotspot?.y ?? 0.5) * 100}%`,

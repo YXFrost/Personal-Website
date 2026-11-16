@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { entryPath, formatDate } from "@/lib/utils.mjs";
+import { archiveEntryPath, formatDate } from "@/lib/utils.mjs";
 import TagList from "./TagList";
-export default function ProgressCard({ entry }) {
+export default function ProgressCard({ entry, filters }) {
   return (
     <article className="progress-card" data-reveal="">
       <div className="progress-stamp">
-        <span className="eyebrow">Field notes</span>
         <span>{formatDate(entry.month || entry.publishedAt, true)}</span>
         {typeof entry.studyHours === "number" && (
           <strong>
@@ -16,7 +15,7 @@ export default function ProgressCard({ entry }) {
       </div>
       <div>
         <h3>
-          <Link className="card-title" href={entryPath(entry)}>
+          <Link className="card-title" href={archiveEntryPath(entry, filters)} prefetch={false}>
             {entry.title} <span aria-hidden="true">→</span>
           </Link>
         </h3>

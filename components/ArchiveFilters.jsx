@@ -1,11 +1,8 @@
 import Link from "next/link";
 import Form from "next/form";
 import SearchSubmit from "./SearchSubmit";
-function archiveUrl(basePath, params) {
-  const p = new URLSearchParams();
-  for (const [k, v] of Object.entries(params)) if (v) p.set(k, v);
-  return `${basePath}${p.size ? `?${p}` : ""}`;
-}
+import { archiveUrl } from "@/lib/utils.mjs";
+export { default as ArchiveCount } from "./ArchiveCount";
 // Search box and filter chips shared by the Writing, Projects and Progress archives.
 // active: { q, category, tag }. facets: { param, values: [{ value, count }], allLabel }.
 export default function ArchiveFilters({
@@ -21,10 +18,11 @@ export default function ArchiveFilters({
   return (
     <>
       {search && (
-        <Form action={basePath} className="search-form" role="search">
+        <Form action={basePath} className="search-form" role="search" prefetch={false}>
           <label htmlFor={search.id}>{search.label}</label>
           <div>
             <input
+              key={active.q}
               id={search.id}
               name="q"
               type="search"
@@ -36,6 +34,7 @@ export default function ArchiveFilters({
               <input name="category" type="hidden" value={active.category} />
             )}
             {active.tag && <input name="tag" type="hidden" value={active.tag} />}
+            {active.month && <input name="month" type="hidden" value={active.month} />}
             <SearchSubmit results={resultsId} />
           </div>
         </Form>
@@ -62,21 +61,11 @@ export default function ArchiveFilters({
     </>
   );
 }
-export function ArchiveCount({ count, noun, active, basePath }) {
-  const filtered = active.q || active.category || active.tag;
-  return (
-    <div className="archive-count">
-      <span>
-        {count} {count === 1 ? noun[0] : noun[1]}
-        {active.q ? ` matching “${active.q}”` : ""}
-        {active.tag ? ` · tagged #${active.tag}` : ""}
-      </span>
-      {filtered && <Link href={basePath}>Clear filters ×</Link>}
-    </div>
-  );
-}
 // Read q, category and tag from searchParams, ignoring arrays and long values.
-export function readFilters(params) {
-  const one = (v) => (typeof v === "string" ? v.slice(0, 150) : "");
-  return { q: one(params?.q), category: one(params?.category), tag: one(params?.tag) };
+export function readFilters(params, { progress = false } = {}) {
+  const one = (value) => typeof value === "string" ? value.slice(0, 150).trim() : "";
+  const active = { q: one(params?.q), tag: one(params?.tag) };
+  if (!progress) return { ...active, category: one(params?.category) };
+  const month = one(params?.month);
+  return { ...active, month: /^\d{4}-(0[1-9]|1[0-2])$/.test(month) ? month : "" };
 }

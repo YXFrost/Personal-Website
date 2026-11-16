@@ -19,21 +19,13 @@ export default async function HomePage() {
   const featured = [...writing, ...projects]
     .filter((d) => d.featured)
     .slice(0, 2);
-  // Number only the sections that render, so the sequence always starts at 01.
-  const order = [
-    featured.length > 0 && "featured",
-    "writing",
-    "projects",
-    "progress",
-  ].filter(Boolean);
-  const number = (key) => String(order.indexOf(key) + 1).padStart(2, "0");
   return (
     <>
-      <HeroSection />
+      <HeroSection lead={writing[0] || projects[0] || progress[0]} />
       <div className="container home-content">
         {featured.length > 0 && (
           <section className="section">
-            <SectionHeading number={number("featured")} title="Worth a closer look" />
+            <SectionHeading title="Featured" />
             <div className="featured-grid">
               {featured.map((d) =>
                 d._type === "writing" ? (
@@ -47,7 +39,6 @@ export default async function HomePage() {
         )}
         <section className="section" id="writing">
           <SectionHeading
-            number={number("writing")}
             title="Recent writing"
             href="/writing"
             linkText="All writing"
@@ -68,7 +59,6 @@ export default async function HomePage() {
         </section>
         <section className="section" id="projects">
           <SectionHeading
-            number={number("projects")}
             title="Things I’m building"
             href="/projects"
             linkText="All projects"
@@ -89,7 +79,6 @@ export default async function HomePage() {
         </section>
         <section className="section progress-section">
           <SectionHeading
-            number={number("progress")}
             title="Learning, in progress"
             href="/progress"
             linkText="The archive"
@@ -109,13 +98,7 @@ export default async function HomePage() {
           )}
         </section>
         <section className="section about-strip" data-reveal="">
-          <p className="eyebrow">A little context</p>
-          <h2>
-            Following the questions.
-            <br />
-            <span>Keeping the notes.</span>
-          </h2>
-          <p>{site.description}</p>
+          <h2>About the notebook</h2>
           <Link className="text-link" href="/about">
             More about me <span aria-hidden="true">→</span>
           </Link>

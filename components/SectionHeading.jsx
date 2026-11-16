@@ -1,11 +1,8 @@
 import Link from "next/link";
-export default function SectionHeading({ number, title, href, linkText }) {
+export default function SectionHeading({ title, href, linkText }) {
   return (
     <div className="section-heading" data-reveal="">
-      <div>
-        <span className="eyebrow">{number} /</span>
-        <h2>{title}</h2>
-      </div>
+      <h2>{title}</h2>
       {href && (
         <Link href={href} className="text-link">
           {linkText || "View all"} <span aria-hidden="true">→</span>

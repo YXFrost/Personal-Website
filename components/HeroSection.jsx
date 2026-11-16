@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
-import { formatDate } from "@/lib/utils.mjs";
+import { entryPath, formatDate } from "@/lib/utils.mjs";
 import HeroGlow from "./HeroGlow";
-export default function HeroSection() {
+export default function HeroSection({ lead }) {
   const current = Object.entries(site.currently || {}).filter(
     ([key, value]) => key !== "updated" && value,
   );
@@ -11,21 +11,14 @@ export default function HeroSection() {
       <HeroGlow />
       <div className="container hero-grid">
         <div>
-          <p className="eyebrow">A personal notebook / {site.name}</p>
-          <h1>
-            I learn by
-            <br />
-            <em>building.</em>
-          </h1>
-          <p className="hero-subtitle">Studying, writing & making things.</p>
+          <h1>I learn by <span>building.</span></h1>
           <p className="hero-description">{site.description}</p>
           <div className="actions">
-            <Link className="button" href="/writing">
-              Explore the writing <span aria-hidden="true" data-arrow="ne">↗</span>
+            <Link className="button" href={lead ? entryPath(lead) : "/about"} aria-describedby={lead ? "hero-entry" : undefined}>
+              {lead?._type === "writing" ? "Read the latest essay" : lead ? "Read the latest entry" : "About the notebook"}
+              <span aria-hidden="true">→</span>
             </Link>
-            <Link className="text-link" href="/projects">
-              See what I’m building <span aria-hidden="true">→</span>
-            </Link>
+            {lead && <p className="hero-entry" id="hero-entry">{lead.title}</p>}
           </div>
         </div>
         <aside className="currently" aria-labelledby="currently-title">
@@ -50,10 +43,6 @@ export default function HeroSection() {
             </p>
           )}
         </aside>
-      </div>
-      <div className="container hero-foot">
-        <span>Curiosity, with a paper trail.</span>
-        <span aria-hidden="true">↓</span>
       </div>
     </section>
   );

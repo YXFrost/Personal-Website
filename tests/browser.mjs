@@ -30,20 +30,21 @@ page.on("pageerror", (e) => errors.push(e.message));
 page.on("console", (m) => {
   if (m.type() === "error" || m.type() === "warning") errors.push(m.text());
 });
-// Real datasets and the local fallback use different project slugs, so find one
-// project detail page from the archive instead of hardcoding it.
-async function findProjectRoute() {
+async function findImageRoute() {
   if (process.env.TEST_PROJECT) return process.env.TEST_PROJECT;
-  const html = await (await fetch(base + "/projects")).text();
-  const slugs = [...new Set(html.match(/\/projects\/[a-z0-9-]+(?=")/g) || [])];
+  const archives = await Promise.all(["projects", "writing", "progress"].map(async (section) => {
+    const html = await (await fetch(base + "/" + section)).text();
+    return html.match(/\/(?:projects|writing|progress)\/[a-z0-9-]+(?=")/g) || [];
+  }));
+  const slugs = new Set(archives.flat());
   for (const route of slugs) {
     const detail = await (await fetch(base + route)).text();
     if (detail.includes("Enlarge image")) return route;
   }
-  throw new Error("No project page with an enlargeable image found under /projects");
+  throw new Error("No entry with an enlargeable image found");
 }
-const projectRoute = await findProjectRoute();
-const routes = [
+const projectRoute = await findImageRoute();
+const routes = [...new Set([
   "/",
   "/writing",
   "/projects",
@@ -59,7 +60,7 @@ const routes = [
         "/projects/legacy-compatibility",
       ]
     : []),
-];
+])];
 const results = {
   preview,
   zoomMode: nativeZoom
@@ -117,7 +118,7 @@ try {
       ),
     );
     const axe = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "best-practice"])
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
       .analyze();
     results.accessibility.push({
       route,
@@ -167,10 +168,11 @@ try {
   assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden");
   await page.setViewportSize({ width: 390, height: 844 });
   const toggle = page.locator(".menu-toggle");
+  const menu = page.locator(".mobile-nav");
   await toggle.click();
-  assert.equal(await toggle.getAttribute("aria-expanded"), "true");
+  assert.equal(await menu.getAttribute("open"), "");
   await page.keyboard.press("Escape");
-  assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+  assert.equal(await menu.getAttribute("open"), null);
   assert.ok(await toggle.evaluate((e) => e === document.activeElement));
   await toggle.click();
   await page
@@ -178,12 +180,46 @@ try {
     .getByRole("link", { name: "Writing", exact: true })
     .click();
   await page.waitForURL("**/writing");
-  assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+  assert.equal(await menu.getAttribute("open"), null);
+  if (engine) {
+    const noScript = await engine.newPage({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    try {
+      await noScript.goto(base);
+      await noScript.locator(".menu-toggle").click();
+      await noScript.getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "Progress", exact: true }).click();
+      await noScript.waitForURL("**/progress");
+    } finally {
+      await noScript.close();
+    }
+  }
   if (preview) {
     await page.getByLabel("Find an essay or topic").fill("shorter");
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await page.waitForURL("**/writing?q=shorter");
     assert.equal(await page.locator(".article-card").count(), 1);
+    assert.match(await page.getByRole("status").innerText(), /1 entry matching/);
+    await page.locator(".article-card .card-title").click();
+    await page.getByRole("link", { name: "Back to results" }).click();
+    await page.waitForURL("**/writing?q=shorter");
+    await page.getByRole("link", { name: "Clear filters" }).click();
+    await page.waitForURL("**/writing");
+    await page.waitForFunction(() => document.activeElement.id === "writing-search");
+    assert.equal(await page.getByRole("searchbox").inputValue(), "");
+    await page.goBack();
+    await page.waitForURL("**/writing?q=shorter");
+    assert.equal(await page.getByRole("searchbox").inputValue(), "shorter");
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.goto(base + "/writing?q=" + "x".repeat(150));
+    await layout("long query at 320px");
+    assert.ok(await page.getByRole("link", { name: "Clear filters" }).isVisible());
+    await page.goto(base + "/progress?category=unknown");
+    assert.ok(await page.locator(".progress-card").count());
+    const monthLinks = page.locator(".hours-list a");
+    assert.ok(await monthLinks.count());
+    const monthBox = await monthLinks.first().boundingBox();
+    assert.ok(monthBox.height >= 44 && monthBox.width >= 24);
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(base + "/writing/reading-specimen", { waitUntil: "load" });
     assert.equal(await page.locator(".prose strong").count(), 1);
     assert.ok(await page.locator(".prose em").count());
@@ -312,6 +348,9 @@ try {
   // An actual missing slug must return 404, not an empty article with HTTP 200.
   const missing = await page.request.get(base + "/writing/not-a-real-entry");
   assert.equal(missing.status(), 404);
+  const unmatched = await page.request.get(base + "/unknown-portfolio-path");
+  assert.equal(unmatched.status(), 404);
+  assert.match(await unmatched.text(), /Back to the notebook/);
   assert.deepEqual(
     errors,
     [],

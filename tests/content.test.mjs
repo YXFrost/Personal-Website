@@ -186,16 +186,18 @@ test("hours chart covers the twelve months up to the newest log", () => {
   assert.deepEqual(months.map((m) => m.hours), [null, null, null, 24, null, null, null, null, null, 18, null, 42]);
   const two = hoursByMonth([log("2026-08-01", 10), log("2026-08-15", 5)]);
   assert.equal(two.at(-1).hours, 15);
+  assert.equal(two.at(-1).entries.length, 2);
+  assert.equal(filterEntries(two.at(-1).entries, { month: "2026-08" }).length, 2);
 });
-test("subject totals attribute a log's hours to each of its subjects", () => {
+test("subject totals count logs by subject once per log", () => {
   const totals = subjectTotals([
     { subjects: ["Mathematics", "Literature"], studyHours: 42 },
     { subjects: ["Mathematics"], studyHours: 24 },
     { subjects: ["Physics", "Physics"] },
   ]);
   assert.deepEqual(totals, [
-    { subject: "Mathematics", logs: 2, hours: 66 },
-    { subject: "Literature", logs: 1, hours: 42 },
-    { subject: "Physics", logs: 1, hours: 0 },
+    { subject: "Mathematics", logs: 2 },
+    { subject: "Literature", logs: 1 },
+    { subject: "Physics", logs: 1 },
   ]);
 });

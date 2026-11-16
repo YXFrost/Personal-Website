@@ -2,8 +2,11 @@ import { readFileSync } from "node:fs";
 const legacyRoutes = JSON.parse(readFileSync(new URL("./content/legacy-routes.json", import.meta.url), "utf8"));
 const config = {
   poweredByHeader: false, reactStrictMode: true, devIndicators: false,
+  experimental: { globalNotFound: true },
   async redirects() {
-    return legacyRoutes.map(({ source, destination }) => ({ source, destination, permanent: true }));
+    return legacyRoutes
+      .filter(({ documentId }) => !documentId || (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && process.env.CONTENT_PREVIEW !== "1"))
+      .map(({ source, destination }) => ({ source, destination, permanent: true }));
   },
   async headers() {
     return [{ source: "/:path*", headers: [

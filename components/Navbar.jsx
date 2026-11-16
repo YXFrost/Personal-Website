@@ -1,81 +1,86 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+
 const links = [
   ["/writing", "Writing"],
   ["/projects", "Projects"],
   ["/progress", "Progress"],
   ["/about", "About"],
 ];
+
+function NavigationLinks({ pathname, onClick }) {
+  return (
+    <ul className="nav-links">
+      {links.map(([href, label]) => (
+        <li key={href}>
+          <Link
+            href={href}
+            onClick={onClick}
+            aria-current={pathname === href ? "page" : pathname.startsWith(href + "/") ? "location" : undefined}
+          >
+            {label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   return <Navigation key={pathname} pathname={pathname} />;
 }
+
 function Navigation({ pathname }) {
-  const [open, setOpen] = useState(false);
-  const button = useRef(null);
   const header = useRef(null);
-  // Close when the user taps or clicks outside the open menu.
+  const mobile = useRef(null);
+  const toggle = useRef(null);
+
+  function closeMenu() {
+    if (mobile.current) mobile.current.open = false;
+  }
+
   useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (e) => {
-      if (!header.current?.contains(e.target)) setOpen(false);
+    const onPointerDown = (event) => {
+      if (mobile.current?.open && !header.current?.contains(event.target)) closeMenu();
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open]);
+  }, []);
+
   return (
     <header
       ref={header}
       className="site-header"
       style={{ viewTransitionName: "site-header" }}
-      onBlur={(e) => {
-        if (open && !e.currentTarget.contains(e.relatedTarget)) setOpen(false);
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && open) {
-          setOpen(false);
-          button.current?.focus();
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && mobile.current?.open) {
+          closeMenu();
+          toggle.current?.focus();
         }
       }}
     >
       <nav className="container nav" aria-label="Main navigation">
-        <Link href="/" className="wordmark" aria-label="YN — homepage" onClick={() => setOpen(false)}>
+        <Link href="/" className="wordmark" aria-label="YN — homepage" onClick={closeMenu}>
           YN<span>.</span>
         </Link>
-        <button
-          ref={button}
-          type="button"
-          className="menu-toggle"
-          aria-expanded={open}
-          aria-controls="main-navigation"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? "Close −" : "Menu +"}
-        </button>
-        <div
-          id="main-navigation"
-          className={`nav-panel ${open ? "is-open" : ""}`}
-        >
-          <ul className="nav-links">
-            {links.map(([href, label]) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  onClick={() => setOpen(false)}
-                  aria-current={
-                    pathname === href || pathname.startsWith(href + "/")
-                      ? "page"
-                      : undefined
-                  }
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div className="desktop-nav">
+          <NavigationLinks pathname={pathname} />
         </div>
+        <details
+          ref={mobile}
+          className="mobile-nav"
+          onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
+          }}
+        >
+          <summary ref={toggle} className="menu-toggle">
+            <span>Menu</span><span className="menu-indicator" aria-hidden="true" />
+          </summary>
+          <NavigationLinks pathname={pathname} onClick={closeMenu} />
+        </details>
       </nav>
     </header>
   );

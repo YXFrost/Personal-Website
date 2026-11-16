@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getEntry, getEntries } from "@/lib/content";
 import { site, absoluteUrl, preview } from "@/lib/site";
@@ -7,6 +8,7 @@ import ArticleRenderer, { getHeadings } from "./ArticleRenderer";
 import Toc from "./Toc";
 import TagList from "./TagList";
 import EntryPager from "./EntryPager";
+import ArchiveReturn from "./ArchiveReturn";
 import ProjectCard from "./ProjectCard";
 import ResponsiveImage from "./ResponsiveImage";
 import ArticleCard from "./ArticleCard";
@@ -85,6 +87,9 @@ export default async function EntryPage({ type, slug }) {
       >
         <span aria-hidden="true">←</span> All {labels[type].toLowerCase()}
       </Link>
+      <Suspense>
+        <ArchiveReturn archive={routes[type]} />
+      </Suspense>
       <article>
         <header className="entry-header">
           <p className="eyebrow">
@@ -130,8 +135,8 @@ export default async function EntryPage({ type, slug }) {
           >
             <ResponsiveImage
               image={entry.coverImage}
-              zoomable={type === "project"}
-              priority
+              zoomable
+              eager
               sizes="(max-width: 1024px) calc(100vw - 40px), 1000px"
             />
             {entry.coverImage.caption && (

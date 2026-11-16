@@ -3,7 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import RevealObserver from "@/components/RevealObserver";
-import { site, siteUrl, preview, hasPublicOrigin } from "@/lib/site";
+import { site, siteUrl, preview, isPublicSite } from "@/lib/site";
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -11,11 +11,8 @@ export const metadata = {
     template: `%s | ${site.name}`,
   },
   description: site.description,
-  alternates: { types: { "application/rss+xml": "/feed.xml" } },
   robots:
-    preview || !hasPublicOrigin
-      ? { index: false, follow: false }
-      : { index: true, follow: true },
+    isPublicSite ? { index: true, follow: true } : { index: false, follow: false },
 };
 export const viewport = {
   width: "device-width",

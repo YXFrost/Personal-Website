@@ -1,11 +1,12 @@
 import Link from "next/link";
 import ResponsiveImage from "./ResponsiveImage";
 import TagList from "./TagList";
-import { entryPath, formatDate } from "@/lib/utils.mjs";
+import { archiveEntryPath, formatDate } from "@/lib/utils.mjs";
 export default function ArticleCard({
   entry,
   featured = false,
   headingLevel = "h3",
+  filters,
 }) {
   const Heading = headingLevel;
   return (
@@ -33,9 +34,9 @@ export default function ArticleCard({
           <span>{entry.readingTime} min read</span>
         </div>
         <Heading>
-          <Link className="card-title" href={entryPath(entry)}>
+          <Link className="card-title" href={archiveEntryPath(entry, filters)} prefetch={false}>
             {entry.title}{" "}
-            <span aria-hidden="true" data-arrow="ne">↗</span>
+            <span aria-hidden="true">→</span>
           </Link>
         </Heading>
         <p>{entry.summary}</p>

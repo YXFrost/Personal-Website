@@ -1,9 +1,9 @@
 import { getEntries } from "@/lib/content";
-import { site, absoluteUrl, preview } from "@/lib/site";
+import { site, absoluteUrl, isPublicSite } from "@/lib/site";
 import { entryPath, isIndexable, escapeXml as x } from "@/lib/utils.mjs";
 export const revalidate = 60;
 export async function GET() {
-  const entries = preview ? [] : (await getEntries("writing")).filter(isIndexable);
+  const entries = isPublicSite ? (await getEntries("writing")).filter(isIndexable) : [];
   const items = entries
     .map(
       (d) =>
@@ -16,6 +16,7 @@ export async function GET() {
       headers: {
         "Content-Type": "application/rss+xml; charset=utf-8",
         "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        ...(!isPublicSite ? { "X-Robots-Tag": "noindex" } : {}),
       },
     },
   );

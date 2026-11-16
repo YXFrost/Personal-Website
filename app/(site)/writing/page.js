@@ -1,7 +1,8 @@
 import Link from "next/link";
 import ArchiveFilters, { ArchiveCount, readFilters } from "@/components/ArchiveFilters";
 import { getEntries } from "@/lib/content";
-import { facetCounts, filterEntries } from "@/lib/utils.mjs";
+import { facetCounts, filterEntries, isIndexable } from "@/lib/utils.mjs";
+import { isPublicSite } from "@/lib/site";
 import { pageMetadata } from "@/lib/metadata";
 import ArticleCard from "@/components/ArticleCard";
 export const metadata = pageMetadata(
@@ -17,58 +18,60 @@ export default async function WritingPage({ searchParams }) {
   return (
     <div className="container archive">
       <header className="page-heading">
-        <p className="eyebrow">The publication</p>
         <h1>
           Writing<span>.</span>
         </h1>
-        <p>
-          Thinking things through, one essay at a time.
-          <br />
-          Books, science, philosophy, and the connections between them.
-        </p>
+        <p>Essays on books, science, philosophy, and the questions they share.</p>
+        {isPublicSite && entries.some(isIndexable) && (
+          <a className="text-link feed-link" href="/feed.xml">Subscribe via RSS</a>
+        )}
       </header>
-      <ArchiveFilters
-        basePath="/writing"
-        label="Writing categories"
-        active={active}
-        facets={{ param: "category", values: categories, allLabel: "All topics" }}
-        showChips={categories.length > 1 || entries.length > 6}
-        search={{
-          id: "writing-search",
-          label: "Find an essay or topic",
-          placeholder: "Search titles, summaries, tags…",
-        }}
-        resultsId="writing-results"
-      />
-      <ArchiveCount
-        count={filtered.length}
-        noun={["entry", "entries"]}
-        active={active}
-        basePath="/writing"
-      />
+      {entries.length > 0 && (
+        <>
+          <ArchiveFilters
+            basePath="/writing"
+            label="Writing categories"
+            active={active}
+            facets={{ param: "category", values: categories, allLabel: "All topics" }}
+            showChips={categories.length > 1 || entries.length > 6}
+            search={{
+              id: "writing-search",
+              label: "Find an essay or topic",
+              placeholder: "Search titles, summaries, tags…",
+            }}
+            resultsId="writing-results"
+          />
+          <ArchiveCount
+            count={filtered.length}
+            noun={["entry", "entries"]}
+            active={active}
+            basePath="/writing"
+            searchId="writing-search"
+          />
+        </>
+      )}
       <div id="writing-results" className="archive-results">
         {filtered.length ? (
           filtered.map((d) => (
-            <ArticleCard headingLevel="h2" key={d._id} entry={d} />
+            <ArticleCard headingLevel="h2" key={d._id} entry={d} filters={active} />
           ))
         ) : (
           <div className="empty-state" data-reveal="">
-            <p className="eyebrow">An open page</p>
             <h2>
               {entries.length
                 ? "No matching essays."
-                : "The writing starts here."}
+                : "No essays yet."}
             </h2>
             <p>
               {entries.length
                 ? "Try a different phrase or clear the filters."
-                : "A place for considered thoughts and useful questions. Essays will appear here when they’re ready."}
+                : "In the meantime, browse the study logs or see what I’m building."}
             </p>
             <Link
               className="text-link"
-              href={entries.length ? "/writing" : "/projects"}
+              href={entries.length ? "/writing" : "/progress"}
             >
-              {entries.length ? "See all writing" : "Explore the projects"}{" "}
+              {entries.length ? "See all writing" : "Browse study logs"}{" "}
               <span aria-hidden="true">→</span>
             </Link>
           </div>

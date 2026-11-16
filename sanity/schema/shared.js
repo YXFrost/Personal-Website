@@ -39,11 +39,11 @@ export const core = [
   { name: "summary", type: "text", rows: 3 },
   {
     name: "published",
-    title: "Visible on website",
+    title: "Show on the public website",
     type: "boolean",
     initialValue: true,
     description:
-      "Hides the entry from this website only. It is still readable through the public Sanity API; keep private material as a draft.",
+      "Controls whether the website shows this entry. Published documents remain readable through a public dataset’s API. Keep private text unpublished and avoid uploading private files to the public asset CDN.",
   },
   {
     name: "publishedAt",
@@ -69,6 +69,7 @@ export const seo = {
       title: "Hide from search engines, sitemap and feed",
       type: "boolean",
       initialValue: false,
+      description: "The entry remains publicly readable by its URL when it is shown on the website.",
     },
   ],
 };

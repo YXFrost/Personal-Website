@@ -1,8 +1,8 @@
 import Link from "next/link";
 import ResponsiveImage from "./ResponsiveImage";
 import TagList from "./TagList";
-import { entryPath } from "@/lib/utils.mjs";
-export default function ProjectCard({ entry, headingLevel = "h3" }) {
+import { archiveEntryPath } from "@/lib/utils.mjs";
+export default function ProjectCard({ entry, headingLevel = "h3", filters, leading = false }) {
   const Heading = headingLevel;
   return (
     <article className="project-card" data-reveal="">
@@ -11,6 +11,7 @@ export default function ProjectCard({ entry, headingLevel = "h3" }) {
           <ResponsiveImage
             image={entry.coverImage}
             decorative
+            eager={leading}
             sizes="(max-width: 768px) calc(100vw - 40px), (max-width: 1200px) 45vw, 570px"
           />
         ) : (
@@ -26,9 +27,9 @@ export default function ProjectCard({ entry, headingLevel = "h3" }) {
           {entry.status && <span>{entry.status}</span>}
         </div>
         <Heading>
-          <Link className="card-title" href={entryPath(entry)}>
+          <Link className="card-title" href={archiveEntryPath(entry, filters)} prefetch={false}>
             {entry.title}{" "}
-            <span aria-hidden="true" data-arrow="ne">↗</span>
+            <span aria-hidden="true">→</span>
           </Link>
         </Heading>
         <p>{entry.summary}</p>
