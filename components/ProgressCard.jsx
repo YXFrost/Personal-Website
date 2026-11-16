@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { entryPath, formatDate } from "@/lib/utils.mjs";
+import TagList from "./TagList";
 export default function ProgressCard({ entry }) {
   return (
     <article className="progress-card" data-reveal="">
@@ -20,13 +21,7 @@ export default function ProgressCard({ entry }) {
           </Link>
         </h3>
         <p>{entry.summary}</p>
-        {entry.subjects?.length > 0 && (
-          <ul className="tags" aria-label="Subjects">
-            {entry.subjects.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ul>
-        )}
+        <TagList tags={entry.subjects || []} basePath="/progress" label="Subjects" />
       </div>
     </article>
   );

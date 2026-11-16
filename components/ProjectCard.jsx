@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ResponsiveImage from "./ResponsiveImage";
+import TagList from "./TagList";
 import { entryPath } from "@/lib/utils.mjs";
 export default function ProjectCard({ entry, headingLevel = "h3" }) {
   const Heading = headingLevel;
@@ -31,13 +32,7 @@ export default function ProjectCard({ entry, headingLevel = "h3" }) {
           </Link>
         </Heading>
         <p>{entry.summary}</p>
-        {entry.technologies.length > 0 && (
-          <ul className="tags" aria-label="Technologies">
-            {entry.technologies.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-        )}
+        <TagList tags={entry.technologies} basePath="/projects" label="Technologies" />
       </div>
     </article>
   );

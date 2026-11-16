@@ -544,6 +544,56 @@ article:has(> .card-title:focus-visible) {
   color: var(--amber);
   margin-right: 0.15rem;
 }
+/* Above the card's full-size title link; padding gives a 44px target without moving layout. */
+.tag-link {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  padding-block: 0.8rem;
+  margin-block: -0.8rem;
+  color: inherit;
+  text-underline-offset: 0.25em;
+}
+.tag-link:hover,
+.tag-link:focus-visible {
+  color: var(--amber);
+  text-decoration: underline;
+}
+.entry-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 3rem;
+}
+.pager-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.pager-link:hover,
+.pager-link:focus-visible {
+  border-color: var(--muted);
+}
+.pager-newer {
+  grid-column: 2;
+  text-align: right;
+  align-items: flex-end;
+}
+.pager-label {
+  display: inline-flex;
+  gap: 0.5rem;
+  color: var(--amber);
+  font: 0.72rem var(--mono);
+}
+.pager-title {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  line-height: 1.35;
+  color: var(--text);
+}
 .image-placeholder {
   height: 100%;
   padding: 2rem;
@@ -1310,6 +1360,12 @@ figcaption {
   :root {
     --header-height: 4rem;
   }
+  .entry-pager {
+    grid-template-columns: 1fr;
+  }
+  .pager-newer {
+    grid-column: 1;
+  }
   .nav {
     flex-wrap: wrap;
     gap: 0;
@@ -1465,6 +1521,21 @@ figcaption {
   .back-link:hover span,
   .back-link:focus-visible span {
     transform: translateX(-3px);
+  }
+  .pager-label span {
+    display: inline-block;
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .pager-older:hover .pager-label span,
+  .pager-older:focus-visible .pager-label span {
+    transform: translateX(-3px);
+  }
+  .pager-newer:hover .pager-label span,
+  .pager-newer:focus-visible .pager-label span {
+    transform: translateX(3px);
+  }
+  .pager-link {
+    transition: border-color var(--dur-1);
   }
   .nav-links a::after {
     transition: transform var(--dur-2) var(--ease-out);
@@ -1725,6 +1796,7 @@ figcaption {
   .toc,
   .copy-button,
   .read-progress,
+  .entry-pager,
   .back-link,
   .article-end,
   .related,

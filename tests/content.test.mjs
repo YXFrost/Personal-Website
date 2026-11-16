@@ -12,6 +12,9 @@ import {
   entryPath,
   getHeadings,
   isIndexable,
+  filterEntries,
+  facetCounts,
+  adjacentEntries,
 } from "../lib/utils.mjs";
 test("legacy project records retain their URLs, write-up, images and links", () => {
   const old = {
@@ -138,4 +141,32 @@ test("entries marked noindex are excluded from sitemap and feed filters", () => 
     entries.filter(isIndexable).map((d) => d.slug),
     ["open", "seo-empty", "explicit"],
   );
+});
+test("archive filters combine search, category and tag across entry types", () => {
+  const docs = [
+    { _type: "writing", slug: "a", title: "On Proofs", summary: "Induction", category: "Essay", tags: ["Mathematics", "Logic"] },
+    { _type: "writing", slug: "b", title: "Margins", summary: "Short notes", category: "Note", tags: ["Reading"] },
+    { _type: "project", slug: "c", title: "Site", summary: "Next.js", status: "Active", technologies: ["React", "CSS"], tags: [] },
+    { _type: "progress", slug: "d", title: "May", summary: "Study", subjects: ["Mathematics"] },
+  ];
+  const slugs = (opts) => filterEntries(docs, opts).map((d) => d.slug);
+  assert.deepEqual(slugs({}), ["a", "b", "c", "d"]);
+  assert.deepEqual(slugs({ tag: "mathematics" }), ["a", "d"]);
+  assert.deepEqual(slugs({ tag: "react" }), ["c"]);
+  assert.deepEqual(slugs({ q: "LOGIC" }), ["a"]);
+  assert.deepEqual(slugs({ q: "notes", category: "Note" }), ["b"]);
+  assert.deepEqual(slugs({ q: "proofs", tag: "Reading" }), []);
+  assert.deepEqual(slugs({ category: "Active", categoryField: "status" }), ["c"]);
+  assert.deepEqual(facetCounts(["B", "A", "B", "", undefined, "C"]), [
+    { value: "B", count: 2 },
+    { value: "A", count: 1 },
+    { value: "C", count: 1 },
+  ]);
+});
+test("adjacent entries follow newest-first order and stop at the ends", () => {
+  const list = [{ slug: "new" }, { slug: "mid" }, { slug: "old" }];
+  assert.deepEqual(adjacentEntries(list, "mid"), { newer: list[0], older: list[2] });
+  assert.deepEqual(adjacentEntries(list, "new"), { newer: null, older: list[1] });
+  assert.deepEqual(adjacentEntries(list, "old"), { newer: list[1], older: null });
+  assert.deepEqual(adjacentEntries(list, "missing"), { newer: null, older: null });
 });

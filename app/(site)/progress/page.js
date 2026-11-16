@@ -1,18 +1,24 @@
 import { getEntries } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import ProgressCard from "@/components/ProgressCard";
+import ArchiveFilters, { ArchiveCount, readFilters } from "@/components/ArchiveFilters";
+import { facetCounts, filterEntries } from "@/lib/utils.mjs";
 export const revalidate = 60;
 export const metadata = pageMetadata(
   "Progress",
   "An archive of study, monthly reflections, and learning milestones.",
   "/progress",
 );
-export default async function ProgressPage() {
+export default async function ProgressPage({ searchParams }) {
+  const active = readFilters(await searchParams);
   const entries = await getEntries("progress");
+  const subjectFacets = facetCounts(entries.flatMap((d) => d.subjects || []));
+  const filtered = filterEntries(entries, active);
+  const filtering = Boolean(active.q || active.tag);
   const logged = entries.filter((d) => typeof d.studyHours === "number");
   const total = logged.reduce((sum, d) => sum + d.studyHours, 0);
   const subjects = new Set(entries.flatMap((d) => d.subjects || []));
-  const groups = entries.reduce((groups, d) => {
+  const groups = filtered.reduce((groups, d) => {
     const year = (d.month || d.publishedAt || "Undated").slice(0, 4);
     (groups[year] ||= []).push(d);
     return groups;
@@ -52,6 +58,37 @@ export default async function ProgressPage() {
             </div>
           )}
         </dl>
+      )}
+      {entries.length > 0 && (
+        <ArchiveFilters
+          basePath="/progress"
+          label="Subjects"
+          active={active}
+          facets={{ param: "tag", values: subjectFacets, allLabel: "All subjects" }}
+          showChips={subjectFacets.length > 1 || entries.length > 6}
+          search={
+            entries.length > 12 && {
+              id: "progress-search",
+              label: "Find a log or subject",
+              placeholder: "Search titles, summaries, subjects…",
+            }
+          }
+          resultsId="progress-results"
+        />
+      )}
+      {filtering && (
+        <ArchiveCount
+          count={filtered.length}
+          noun={["log", "logs"]}
+          active={active}
+          basePath="/progress"
+        />
+      )}
+      {entries.length > 0 && !filtered.length && (
+        <div className="empty-state" data-reveal="">
+          <h2>No logs match.</h2>
+          <p>Try another subject or clear the filters.</p>
+        </div>
       )}
       {Object.entries(groups)
         .sort(([a], [b]) => b.localeCompare(a))

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ResponsiveImage from "./ResponsiveImage";
+import TagList from "./TagList";
 import { entryPath, formatDate } from "@/lib/utils.mjs";
 export default function ArticleCard({
   entry,
@@ -38,13 +39,7 @@ export default function ArticleCard({
           </Link>
         </Heading>
         <p>{entry.summary}</p>
-        {entry.tags.length > 0 && (
-          <ul className="tags" aria-label="Tags">
-            {entry.tags.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-        )}
+        <TagList tags={entry.tags} basePath="/writing" label="Tags" />
       </div>
     </article>
   );

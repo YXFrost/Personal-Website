@@ -2,9 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getEntry, getEntries } from "@/lib/content";
 import { site, absoluteUrl, preview } from "@/lib/site";
-import { entryPath, formatDate, safeUrl, jsonLd } from "@/lib/utils.mjs";
+import { entryPath, formatDate, safeUrl, jsonLd, adjacentEntries, routes } from "@/lib/utils.mjs";
 import ArticleRenderer, { getHeadings } from "./ArticleRenderer";
 import Toc from "./Toc";
+import TagList from "./TagList";
+import EntryPager from "./EntryPager";
+import ProjectCard from "./ProjectCard";
 import ResponsiveImage from "./ResponsiveImage";
 import ArticleCard from "./ArticleCard";
 import { imageInfo } from "@/lib/images";
@@ -33,9 +36,11 @@ export default async function EntryPage({ type, slug }) {
   const headings = getHeadings(entry.body);
   const entryTags = (type === "project" ? entry.technologies : entry.tags) || [];
   const toc = headings.length >= 4;
+  const siblings = await getEntries(type);
+  const { newer, older } = adjacentEntries(siblings, slug);
   const related =
     type === "writing"
-      ? (await getEntries("writing"))
+      ? siblings
           .filter(
             (d) =>
               d.slug !== slug &&
@@ -43,7 +48,15 @@ export default async function EntryPage({ type, slug }) {
                 d.tags.some((t) => entry.tags.includes(t))),
           )
           .slice(0, 2)
-      : [];
+      : type === "project"
+        ? siblings
+            .filter(
+              (d) =>
+                d.slug !== slug &&
+                d.technologies.some((t) => entry.technologies.includes(t)),
+            )
+            .slice(0, 2)
+        : [];
   const data = {
     "@context": "https://schema.org",
     "@type": type === "writing" ? "BlogPosting" : "CreativeWork",
@@ -91,16 +104,11 @@ export default async function EntryPage({ type, slug }) {
               <span>Updated {formatDate(entry.updatedAt)}</span>
             )}
           </div>
-          {entryTags.length > 0 && (
-            <ul
-              className="tags"
-              aria-label={type === "project" ? "Technologies" : "Tags"}
-            >
-              {entryTags.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-          )}
+          <TagList
+            tags={entryTags}
+            basePath={routes[type]}
+            label={type === "project" ? "Technologies" : "Tags"}
+          />
           {type === "project" && (
             <div className="actions">
               {safeUrl(entry.githubUrl) && (
@@ -216,12 +224,23 @@ export default async function EntryPage({ type, slug }) {
           </div>
         </div>
       </article>
-      {related.length > 0 && (
+      <EntryPager newer={newer} older={older} monthly={type === "progress"} />
+      {related.length > 0 && type === "writing" && (
         <section className="section related">
           <h2>Keep exploring</h2>
           {related.map((d) => (
             <ArticleCard key={d._id} entry={d} />
           ))}
+        </section>
+      )}
+      {related.length > 0 && type === "project" && (
+        <section className="section related">
+          <h2>Related projects</h2>
+          <div className="project-grid">
+            {related.map((d) => (
+              <ProjectCard key={d._id} entry={d} />
+            ))}
+          </div>
         </section>
       )}
     </div>

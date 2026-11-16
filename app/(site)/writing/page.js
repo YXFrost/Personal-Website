@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Form from "next/form";
-import SearchSubmit from "@/components/SearchSubmit";
+import ArchiveFilters, { ArchiveCount, readFilters } from "@/components/ArchiveFilters";
 import { getEntries } from "@/lib/content";
+import { facetCounts, filterEntries } from "@/lib/utils.mjs";
 import { pageMetadata } from "@/lib/metadata";
 import ArticleCard from "@/components/ArticleCard";
 export const metadata = pageMetadata(
@@ -10,26 +10,10 @@ export const metadata = pageMetadata(
   "/writing",
 );
 export default async function WritingPage({ searchParams }) {
-  const params = await searchParams;
-  const query = typeof params?.q === "string" ? params.q.slice(0, 150) : "";
-  const category = typeof params?.category === "string" ? params.category : "";
+  const active = readFilters(await searchParams);
   const entries = await getEntries("writing");
-  const categories = [
-    ...new Set(entries.map((d) => d.category).filter(Boolean)),
-  ].sort();
-  const filtered = entries.filter(
-    (d) =>
-      (!category || d.category === category) &&
-      `${d.title} ${d.summary} ${d.tags.join(" ")}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
-  const filterUrl = (c) => {
-    const p = new URLSearchParams();
-    if (query) p.set("q", query);
-    if (c) p.set("category", c);
-    return `/writing${p.size ? `?${p}` : ""}`;
-  };
+  const categories = facetCounts(entries.map((d) => d.category));
+  const filtered = filterEntries(entries, active);
   return (
     <div className="container archive">
       <header className="page-heading">
@@ -43,45 +27,25 @@ export default async function WritingPage({ searchParams }) {
           Books, science, philosophy, and the connections between them.
         </p>
       </header>
-      <Form action="/writing" className="search-form" role="search">
-        <label htmlFor="writing-search">Find an essay or topic</label>
-        <div>
-          <input
-            id="writing-search"
-            name="q"
-            type="search"
-            defaultValue={query}
-            placeholder="Search titles, summaries, tags…"
-            maxLength={150}
-          />
-          {category && <input name="category" type="hidden" value={category} />}
-          <SearchSubmit results="writing-results" />
-        </div>
-      </Form>
-      {categories.length > 0 && (
-        <nav className="filters" aria-label="Writing categories">
-          <Link
-            href={filterUrl("")}
-            aria-current={!category ? "page" : undefined}
-          >
-            All topics
-          </Link>
-          {categories.map((c) => (
-            <Link
-              key={c}
-              href={filterUrl(c)}
-              aria-current={category === c ? "page" : undefined}
-            >
-              {c}
-            </Link>
-          ))}
-        </nav>
-      )}
-      <div className="archive-count">
-        {filtered.length} {filtered.length === 1 ? "entry" : "entries"}
-        {query ? ` matching “${query}”` : ""}
-        {(query || category) && <Link href="/writing">Clear filters ×</Link>}
-      </div>
+      <ArchiveFilters
+        basePath="/writing"
+        label="Writing categories"
+        active={active}
+        facets={{ param: "category", values: categories, allLabel: "All topics" }}
+        showChips={categories.length > 1 || entries.length > 6}
+        search={{
+          id: "writing-search",
+          label: "Find an essay or topic",
+          placeholder: "Search titles, summaries, tags…",
+        }}
+        resultsId="writing-results"
+      />
+      <ArchiveCount
+        count={filtered.length}
+        noun={["entry", "entries"]}
+        active={active}
+        basePath="/writing"
+      />
       <div id="writing-results" className="archive-results">
         {filtered.length ? (
           filtered.map((d) => (
