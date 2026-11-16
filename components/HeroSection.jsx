@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { formatDate } from "@/lib/utils.mjs";
+import HeroGlow from "./HeroGlow";
 export default function HeroSection() {
   const current = Object.entries(site.currently || {}).filter(
     ([key, value]) => key !== "updated" && value,
   );
   return (
     <section className="hero" id="home">
+      <HeroGlow />
       <div className="container hero-grid">
         <div>
           <p className="eyebrow">A personal notebook / {site.name}</p>

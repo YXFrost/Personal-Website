@@ -294,6 +294,52 @@ figcaption {
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 48px 48px;
   border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+/* Pointer glow: a warm wash plus amber grid lines, both centred on the pointer. */
+.hero-glow {
+  display: none;
+}
+.hero > .container {
+  position: relative;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .hero-glow {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-2) var(--ease-out);
+    background: radial-gradient(
+      circle 320px at var(--mx, 50%) var(--my, 50%),
+      rgb(238 185 94 / 0.09),
+      transparent 70%
+    );
+  }
+  .hero-glow::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(238 185 94 / 0.45) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(238 185 94 / 0.45) 1px, transparent 1px);
+    background-size: 48px 48px;
+    -webkit-mask-image: radial-gradient(
+      circle 200px at var(--mx, 50%) var(--my, 50%),
+      #000,
+      transparent
+    );
+    mask-image: radial-gradient(
+      circle 200px at var(--mx, 50%) var(--my, 50%),
+      #000,
+      transparent
+    );
+  }
+  .hero-glow[data-active="true"] {
+    opacity: 1;
+  }
 }
 .hero-grid {
   display: grid;
