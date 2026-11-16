@@ -4,6 +4,7 @@ import { getEntry, getEntries } from "@/lib/content";
 import { site, absoluteUrl, preview } from "@/lib/site";
 import { entryPath, formatDate, safeUrl, jsonLd } from "@/lib/utils.mjs";
 import ArticleRenderer, { getHeadings } from "./ArticleRenderer";
+import Toc from "./Toc";
 import ResponsiveImage from "./ResponsiveImage";
 import ArticleCard from "./ArticleCard";
 import { imageInfo } from "@/lib/images";
@@ -58,6 +59,7 @@ export default async function EntryPage({ type, slug }) {
   if (cover) data.image = absoluteUrl(cover.src);
   return (
     <div className="container entry-page">
+      <div className="read-progress" aria-hidden="true" />
       {!preview && (
         <script
           type="application/ld+json"
@@ -130,23 +132,7 @@ export default async function EntryPage({ type, slug }) {
           </figure>
         )}
         <div className={`reading-layout ${toc ? "has-toc" : ""}`}>
-          {toc && (
-            <aside className="toc">
-              <nav aria-label="On this page">
-                <h2>On this page</h2>
-                <ol>
-                  {headings.map((h) => (
-                    <li
-                      key={h.id}
-                      className={h.level === "h3" ? "toc-nested" : ""}
-                    >
-                      <a href={`#${h.id}`}>{h.title}</a>
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            </aside>
-          )}
+          {toc && <Toc headings={headings} />}
           <div className="reading-body">
             {type === "progress" && (
               <div className="progress-facts">

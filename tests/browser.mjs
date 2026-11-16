@@ -102,6 +102,20 @@ try {
   await page.setViewportSize({ width: 1440, height: 1000 });
   for (const route of routes) {
     await page.goto(base + route, { waitUntil: "load" });
+    // Audit the settled page: entrance animations fade text in over up to ~740ms.
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          // Time-based and finite only: the scroll-driven reading bar never "finishes".
+          .filter(
+            (a) =>
+              a.timeline === document.timeline &&
+              a.effect?.getComputedTiming().iterations !== Infinity,
+          )
+          .map((a) => a.finished.catch(() => {})),
+      ),
+    );
     const axe = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "best-practice"])
       .analyze();
@@ -183,10 +197,14 @@ try {
         .locator(".table-scroll")
         .evaluate((e) => e.scrollWidth > e.clientWidth),
     );
+    // Below 64rem the table of contents is a collapsed <details>; open it first.
+    if (!(await page.locator(".toc details").evaluate((d) => d.open)))
+      await page.locator(".toc summary").click();
     await page
       .getByRole("navigation", { name: "On this page" })
       .getByRole("link", { name: "Follow the argument" })
       .click();
+    assert.equal(await page.locator(".toc details").evaluate((d) => d.open), false);
     await page.waitForTimeout(400);
     assert.ok(
       await page

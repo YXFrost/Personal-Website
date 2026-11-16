@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Form from "next/form";
+import SearchSubmit from "@/components/SearchSubmit";
 import { getEntries } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import ArticleCard from "@/components/ArticleCard";
@@ -41,12 +43,7 @@ export default async function WritingPage({ searchParams }) {
           Books, science, philosophy, and the connections between them.
         </p>
       </header>
-      <form
-        action="/writing"
-        method="get"
-        className="search-form"
-        role="search"
-      >
+      <Form action="/writing" className="search-form" role="search">
         <label htmlFor="writing-search">Find an essay or topic</label>
         <div>
           <input
@@ -58,11 +55,9 @@ export default async function WritingPage({ searchParams }) {
             maxLength={150}
           />
           {category && <input name="category" type="hidden" value={category} />}
-          <button className="button secondary" type="submit">
-            Search
-          </button>
+          <SearchSubmit results="writing-results" />
         </div>
-      </form>
+      </Form>
       {categories.length > 0 && (
         <nav className="filters" aria-label="Writing categories">
           <Link
@@ -87,32 +82,34 @@ export default async function WritingPage({ searchParams }) {
         {query ? ` matching “${query}”` : ""}
         {(query || category) && <Link href="/writing">Clear filters ×</Link>}
       </div>
-      {filtered.length ? (
-        filtered.map((d) => (
-          <ArticleCard headingLevel="h2" key={d._id} entry={d} />
-        ))
-      ) : (
-        <div className="empty-state" data-reveal="">
-          <p className="eyebrow">An open page</p>
-          <h2>
-            {entries.length
-              ? "No matching essays."
-              : "The writing starts here."}
-          </h2>
-          <p>
-            {entries.length
-              ? "Try a different phrase or clear the filters."
-              : "A place for considered thoughts and useful questions. Essays will appear here when they’re ready."}
-          </p>
-          <Link
-            className="text-link"
-            href={entries.length ? "/writing" : "/projects"}
-          >
-            {entries.length ? "See all writing" : "Explore the projects"}{" "}
-            <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-      )}
+      <div id="writing-results" className="archive-results">
+        {filtered.length ? (
+          filtered.map((d) => (
+            <ArticleCard headingLevel="h2" key={d._id} entry={d} />
+          ))
+        ) : (
+          <div className="empty-state" data-reveal="">
+            <p className="eyebrow">An open page</p>
+            <h2>
+              {entries.length
+                ? "No matching essays."
+                : "The writing starts here."}
+            </h2>
+            <p>
+              {entries.length
+                ? "Try a different phrase or clear the filters."
+                : "A place for considered thoughts and useful questions. Essays will appear here when they’re ready."}
+            </p>
+            <Link
+              className="text-link"
+              href={entries.length ? "/writing" : "/projects"}
+            >
+              {entries.length ? "See all writing" : "Explore the projects"}{" "}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
