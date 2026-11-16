@@ -6,7 +6,7 @@ export default function NotFound() {
       <h1>This page isn’t here.</h1>
       <p>The address may have changed, or the entry may still be a draft.</p>
       <Link href="/" className="button">
-        Back to the notebook →
+        Back to the notebook <span aria-hidden="true">→</span>
       </Link>
     </div>
   );

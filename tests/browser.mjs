@@ -146,8 +146,10 @@ try {
     );
   }
   await page.keyboard.press("Escape");
-  assert.equal(await page.getByRole("dialog").count(), 0);
+  // Focus returns at once; the dialog then fades out (280ms) before it leaves the page.
   assert.ok(await imageTrigger.evaluate((node) => node === document.activeElement));
+  await page.getByRole("dialog").waitFor({ state: "hidden", timeout: 2000 });
+  assert.equal(await page.getByRole("dialog").count(), 0);
   assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden");
   await page.setViewportSize({ width: 390, height: 844 });
   const toggle = page.locator(".menu-toggle");

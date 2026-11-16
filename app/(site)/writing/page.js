@@ -108,7 +108,8 @@ export default async function WritingPage({ searchParams }) {
             className="text-link"
             href={entries.length ? "/writing" : "/projects"}
           >
-            {entries.length ? "See all writing" : "Explore the projects"} →
+            {entries.length ? "See all writing" : "Explore the projects"}{" "}
+            <span aria-hidden="true">→</span>
           </Link>
         </div>
       )}

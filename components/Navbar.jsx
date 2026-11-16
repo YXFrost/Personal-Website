@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 const links = [
   ["/writing", "Writing"],
   ["/projects", "Projects"],
@@ -15,9 +15,23 @@ export default function Navbar() {
 function Navigation({ pathname }) {
   const [open, setOpen] = useState(false);
   const button = useRef(null);
+  const header = useRef(null);
+  // Close when the user taps or clicks outside the open menu.
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e) => {
+      if (!header.current?.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
   return (
     <header
+      ref={header}
       className="site-header"
+      onBlur={(e) => {
+        if (open && !e.currentTarget.contains(e.relatedTarget)) setOpen(false);
+      }}
       onKeyDown={(e) => {
         if (e.key === "Escape" && open) {
           setOpen(false);
@@ -39,26 +53,28 @@ function Navigation({ pathname }) {
         >
           {open ? "Close −" : "Menu +"}
         </button>
-        <ul
+        <div
           id="main-navigation"
-          className={`nav-links ${open ? "is-open" : ""}`}
+          className={`nav-panel ${open ? "is-open" : ""}`}
         >
-          {links.map(([href, label]) => (
-            <li key={href}>
-              <Link
-                href={href}
-                onClick={() => setOpen(false)}
-                aria-current={
-                  pathname === href || pathname.startsWith(href + "/")
-                    ? "page"
-                    : undefined
-                }
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+          <ul className="nav-links">
+            {links.map(([href, label]) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  aria-current={
+                    pathname === href || pathname.startsWith(href + "/")
+                      ? "page"
+                      : undefined
+                  }
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </nav>
     </header>
   );

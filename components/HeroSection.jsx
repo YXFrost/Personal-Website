@@ -19,7 +19,7 @@ export default function HeroSection() {
           <p className="hero-description">{site.description}</p>
           <div className="actions">
             <Link className="button" href="/writing">
-              Explore the writing <span aria-hidden="true">↗</span>
+              Explore the writing <span aria-hidden="true" data-arrow="ne">↗</span>
             </Link>
             <Link className="text-link" href="/projects">
               See what I’m building <span aria-hidden="true">→</span>

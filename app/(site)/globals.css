@@ -37,6 +37,10 @@
   --reading: 43rem;
   --gutter: clamp(1.25rem, 4vw, 3rem);
   --ease: 160ms ease;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur-1: 160ms;
+  --dur-2: 280ms;
+  --dur-3: 480ms;
   --header-height: 4.75rem;
 }
 .image-trigger { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: zoom-in; position: relative; }
@@ -259,13 +263,21 @@ figcaption {
 .nav-links a[aria-current] {
   color: var(--amber);
 }
-.nav-links a[aria-current]::after {
+.nav-links a::after {
   content: "";
   position: absolute;
+  left: 0;
   height: 2px;
   bottom: 1px;
   width: 100%;
   background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.nav-links a:hover::after,
+.nav-links a:focus-visible::after,
+.nav-links a[aria-current]::after {
+  transform: scaleX(1);
 }
 .menu-toggle {
   display: none;
@@ -372,6 +384,7 @@ figcaption {
   letter-spacing: 0.1em;
 }
 .status-dot {
+  position: relative;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -569,7 +582,8 @@ article:has(> .card-title:focus-visible) {
   max-width: 47rem;
 }
 .article-card:hover h2,
-.article-card:hover h3 {
+.article-card:hover h3,
+.progress-card:hover h3 {
   color: var(--amber);
 }
 .featured-article {
@@ -1219,15 +1233,30 @@ figcaption {
   .menu-toggle {
     display: block;
   }
-  .nav-links {
-    display: none;
+  .nav-panel {
+    display: grid;
+    grid-template-rows: 0fr;
     flex-basis: 100%;
+    visibility: hidden;
+    opacity: 0;
+  }
+  .nav-panel.is-open {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    opacity: 1;
+  }
+  .nav-panel > .nav-links {
+    min-height: 0;
+    overflow: hidden;
+  }
+  /* The collapsing list clips overflow, so draw the focus ring inside the link. */
+  .nav-panel .nav-links a:focus-visible {
+    outline-offset: -2px;
+  }
+  .nav-links {
     padding-block: 0.5rem 1rem;
     gap: 0.25rem;
     flex-direction: column;
-  }
-  .nav-links.is-open {
-    display: flex;
   }
   .nav-links a {
     padding: 0.5rem 0.75rem;
@@ -1237,7 +1266,7 @@ figcaption {
     border-color: var(--border);
     background: var(--surface);
   }
-  .nav-links a[aria-current]::after {
+  .nav-links a::after {
     display: none;
   }
   .section-heading {
@@ -1317,6 +1346,156 @@ figcaption {
   }
   .search-form input[type="search"] {
     flex-basis: 100%;
+  }
+}
+@media (min-width: 40.01rem) {
+  .nav-panel {
+    display: contents;
+  }
+}
+/* Motion. Opacity and transform only; durations from the --dur tokens. */
+@media (prefers-reduced-motion: no-preference) {
+  .text-link span,
+  .button span,
+  .card-title span,
+  .back-link span {
+    display: inline-block;
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .text-link:hover span,
+  .text-link:focus-visible span,
+  .button:hover span,
+  .button:focus-visible span,
+  article:hover .card-title span,
+  .card-title:focus-visible span {
+    transform: translateX(3px);
+  }
+  .text-link:hover [data-arrow="ne"],
+  .text-link:focus-visible [data-arrow="ne"],
+  .button:hover [data-arrow="ne"],
+  .button:focus-visible [data-arrow="ne"],
+  article:hover .card-title [data-arrow="ne"],
+  .card-title:focus-visible [data-arrow="ne"] {
+    transform: translate(2px, -2px);
+  }
+  .back-link:hover span,
+  .back-link:focus-visible span {
+    transform: translateX(-3px);
+  }
+  .nav-links a::after {
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .prose a {
+    text-decoration-color: color-mix(in srgb, var(--amber) 50%, transparent);
+    transition:
+      color var(--dur-1),
+      text-decoration-color var(--dur-1);
+  }
+  .prose a:hover,
+  .prose a:focus-visible {
+    text-decoration-color: currentColor;
+  }
+  .project-preview img,
+  .article-preview img {
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+  .project-card:hover .project-preview img,
+  .project-card:focus-within .project-preview img,
+  .featured-article:hover .article-preview img,
+  .featured-article:focus-within .article-preview img {
+    transform: scale(1.02);
+  }
+  .project-card,
+  .featured-article {
+    transition: border-color var(--dur-1);
+  }
+  .article-card h2,
+  .article-card h3,
+  .progress-card h3 {
+    transition: color var(--dur-1);
+  }
+  .button,
+  .filters a {
+    transition:
+      color var(--dur-1),
+      background-color var(--dur-1),
+      border-color var(--dur-1),
+      transform var(--dur-1) var(--ease-out);
+  }
+  .button:active,
+  .filters a:active {
+    transform: translateY(1px);
+  }
+  .status-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--amber);
+    animation: pulse 2.4s var(--ease-out) infinite;
+  }
+  .image-dialog,
+  .image-dialog::backdrop {
+    opacity: 0;
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      overlay var(--dur-2) allow-discrete,
+      display var(--dur-2) allow-discrete;
+  }
+  .image-dialog {
+    transform: scale(0.98);
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      transform var(--dur-2) var(--ease-out),
+      overlay var(--dur-2) allow-discrete,
+      display var(--dur-2) allow-discrete;
+  }
+  .image-dialog[open],
+  .image-dialog[open]::backdrop {
+    opacity: 1;
+  }
+  .image-dialog[open] {
+    transform: none;
+  }
+  @starting-style {
+    .image-dialog[open],
+    .image-dialog[open]::backdrop {
+      opacity: 0;
+    }
+    .image-dialog[open] {
+      transform: scale(0.98);
+    }
+  }
+  @media (min-width: 48rem) and (hover: hover) {
+    .image-enlarge {
+      opacity: 0;
+      transition: opacity var(--dur-1);
+    }
+    .image-trigger:hover .image-enlarge,
+    .image-trigger:focus-visible .image-enlarge {
+      opacity: 1;
+    }
+  }
+  @media (max-width: 40rem) {
+    .nav-panel {
+      transition:
+        grid-template-rows var(--dur-2) var(--ease-out),
+        opacity var(--dur-1),
+        visibility 0s var(--dur-2);
+    }
+    .nav-panel.is-open {
+      transition-delay: 0s;
+    }
+  }
+}
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
   }
 }
 @media (prefers-reduced-motion: reduce) {

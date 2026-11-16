@@ -68,7 +68,7 @@ export default async function EntryPage({ type, slug }) {
         className="back-link"
         href={type === "project" ? "/projects" : `/${type}`}
       >
-        ← All {labels[type].toLowerCase()}
+        <span aria-hidden="true">←</span> All {labels[type].toLowerCase()}
       </Link>
       <article>
         <header className="entry-header">
@@ -103,12 +103,12 @@ export default async function EntryPage({ type, slug }) {
             <div className="actions">
               {safeUrl(entry.githubUrl) && (
                 <a className="button secondary" href={entry.githubUrl}>
-                  Source on GitHub ↗
+                  Source on GitHub <span aria-hidden="true" data-arrow="ne">↗</span>
                 </a>
               )}
               {safeUrl(entry.demoUrl) && (
                 <a className="button secondary" href={entry.demoUrl}>
-                  Open project ↗
+                  Open project <span aria-hidden="true" data-arrow="ne">↗</span>
                 </a>
               )}
             </div>

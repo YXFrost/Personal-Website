@@ -30,8 +30,8 @@ export default function ArticleCard({
         </div>
         <Heading>
           <Link className="card-title" href={entryPath(entry)}>
-            {entry.title}
-            <span aria-hidden="true"> ↗</span>
+            {entry.title}{" "}
+            <span aria-hidden="true" data-arrow="ne">↗</span>
           </Link>
         </Heading>
         <p>{entry.summary}</p>

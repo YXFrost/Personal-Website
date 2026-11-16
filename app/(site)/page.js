@@ -117,7 +117,7 @@ export default async function HomePage() {
           </h2>
           <p>{site.description}</p>
           <Link className="text-link" href="/about">
-            More about me →
+            More about me <span aria-hidden="true">→</span>
           </Link>
         </section>
       </div>
