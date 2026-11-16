@@ -30,11 +30,24 @@ page.on("pageerror", (e) => errors.push(e.message));
 page.on("console", (m) => {
   if (m.type() === "error" || m.type() === "warning") errors.push(m.text());
 });
+// Real datasets and the local fallback use different project slugs, so find one
+// project detail page from the archive instead of hardcoding it.
+async function findProjectRoute() {
+  if (process.env.TEST_PROJECT) return process.env.TEST_PROJECT;
+  const html = await (await fetch(base + "/projects")).text();
+  const slugs = [...new Set(html.match(/\/projects\/[a-z0-9-]+(?=")/g) || [])];
+  for (const route of slugs) {
+    const detail = await (await fetch(base + route)).text();
+    if (detail.includes("Enlarge image")) return route;
+  }
+  throw new Error("No project page with an enlargeable image found under /projects");
+}
+const projectRoute = await findProjectRoute();
 const routes = [
   "/",
   "/writing",
   "/projects",
-  "/projects/personal-website",
+  projectRoute,
   "/progress",
   "/about",
   ...(preview
@@ -114,14 +127,23 @@ try {
   assert.equal(await page.locator(":focus").textContent(), "Skip to content");
   await page.keyboard.press("Enter");
   assert.equal(await page.locator(":focus").getAttribute("id"), "main-content");
-  await page.goto(base + "/projects/personal-website");
+  await page.goto(base + projectRoute);
   const imageTrigger = page.getByRole("button", { name: /^Enlarge image/ }).first();
   await imageTrigger.focus();
   await page.keyboard.press("Enter");
   assert.ok(await page.getByRole("dialog").isVisible());
+  assert.ok(await page.evaluate(() => Boolean(document.activeElement?.closest("dialog"))));
+  // A native modal dialog makes the page inert. Tabbing past its last control may move
+  // focus to the browser UI (activeElement becomes <body>); it must never reach page content.
   for (let i = 0; i < 3; i++) {
     await page.keyboard.press("Tab");
-    assert.ok(await page.locator(":focus").evaluate((node) => Boolean(node.closest("dialog"))));
+    assert.ok(
+      await page.evaluate(() => {
+        const node = document.activeElement;
+        return !node || node === document.body || Boolean(node.closest("dialog"));
+      }),
+      "Focus escaped the image dialog onto page content",
+    );
   }
   await page.keyboard.press("Escape");
   assert.equal(await page.getByRole("dialog").count(), 0);
@@ -202,7 +224,7 @@ try {
       for (const route of [
         "/",
         "/writing",
-        "/projects/personal-website",
+        projectRoute,
         ...(preview ? ["/writing/reading-specimen"] : []),
       ]) {
         await page.goto(base + route, { waitUntil: "load" });
@@ -240,7 +262,7 @@ try {
       for (const route of [
         "/",
         "/writing",
-        "/projects/personal-website",
+        projectRoute,
         ...(preview ? ["/writing/reading-specimen"] : []),
       ]) {
         await page.goto(base + route, { waitUntil: "load" });
@@ -255,7 +277,7 @@ try {
   for (const [width, height, name, route] of [
     [1440, 1000, "home-desktop", "/"],
     [390, 844, "home-mobile", "/"],
-    [1440, 1000, "project-desktop", "/projects/personal-website"],
+    [1440, 1000, "project-desktop", projectRoute],
     ...(preview
       ? [
           [1440, 1000, "article-desktop", "/writing/reading-specimen"],

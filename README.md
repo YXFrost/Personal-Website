@@ -5,7 +5,7 @@ Start with **START-HERE.md** for the Windows installation guide. This is a norma
 ## What was reconciled
 
 - New design: black/amber editorial homepage, Writing / Projects / Progress / About, readable articles, TOC, search, related writing, metadata, sitemap, robots and `/feed.xml`.
-- Current technical foundation: Next 16.2.1, React 19.2.4, Sanity 5.18.0, next-sanity 12.2.1, Tailwind 4.2.2. Core versions are pinned instead of `latest`.
+- Current technical foundation: Next 16.3.5, React 19.3.0, Sanity 6.15.0, next-sanity 13.3.4, Tailwind 4.2.2. Core versions are pinned instead of `latest`.
 - Studio remains embedded at `/studio`, with Sanity's code-input plugin and filename support. No `studio/` subproject or separate deployment.
 - Original project field names and `/projects/[slug]` URLs are preserved. Existing `description`, `longDescription`, `image`, `tags`, `githubUrl` and `liveUrl` are normalized into the new display model.
 - Rich-text headings h1–h6, underline, links, lists, quotes, code, images and captions are supported. Content h1 renders as h2 to retain one page title.
