@@ -31,7 +31,7 @@ export default async function ProjectsPage() {
         ))}
       </div>
       {!entries.length && (
-        <div className="empty-state">
+        <div className="empty-state" data-reveal="">
           <h2>Work in progress.</h2>
           <p>
             Projects will appear here with their context, process, and lessons.

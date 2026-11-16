@@ -1,7 +1,7 @@
 import Link from "next/link";
 export default function SectionHeading({ number, title, href, linkText }) {
   return (
-    <div className="section-heading">
+    <div className="section-heading" data-reveal="">
       <div>
         <span className="eyebrow">{number} /</span>
         <h2>{title}</h2>

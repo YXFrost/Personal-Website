@@ -2,7 +2,7 @@ import Link from "next/link";
 import { entryPath, formatDate } from "@/lib/utils.mjs";
 export default function ProgressCard({ entry }) {
   return (
-    <article className="progress-card">
+    <article className="progress-card" data-reveal="">
       <div className="progress-stamp">
         <span className="eyebrow">Field notes</span>
         <span>{formatDate(entry.month || entry.publishedAt, true)}</span>

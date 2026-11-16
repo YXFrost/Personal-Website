@@ -8,7 +8,10 @@ export default function ArticleCard({
 }) {
   const Heading = headingLevel;
   return (
-    <article className={`article-card ${featured ? "featured-article" : ""}`}>
+    <article
+      className={`article-card ${featured ? "featured-article" : ""}`}
+      data-reveal=""
+    >
       {featured && entry.coverImage && (
         <div className="article-preview">
           <ResponsiveImage

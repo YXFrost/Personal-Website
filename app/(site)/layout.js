@@ -1,6 +1,8 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
+import RevealObserver from "@/components/RevealObserver";
 import { site, siteUrl, preview, hasPublicOrigin } from "@/lib/site";
 export const metadata = {
   metadataBase: new URL(siteUrl),
@@ -35,9 +37,10 @@ export default function RootLayout({ children }) {
           </aside>
         )}
         <main id="main-content" tabIndex={-1}>
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
+        <RevealObserver />
       </body>
     </html>
   );

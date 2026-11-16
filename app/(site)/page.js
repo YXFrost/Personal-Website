@@ -57,7 +57,7 @@ export default async function HomePage() {
               .slice(0, 3)
               .map((d) => <ArticleCard key={d._id} entry={d} />)
           ) : (
-            <div className="empty-note">
+            <div className="empty-note" data-reveal="">
               <p>Room for longer thoughts.</p>
               <span>
                 Essays and notes on books, science, and the ideas that connect
@@ -81,7 +81,7 @@ export default async function HomePage() {
               ))}
           </div>
           {!projects.length && (
-            <p className="empty-note">
+            <p className="empty-note" data-reveal="">
               Project notes will appear here as they take shape.{" "}
               <Link href="/projects">Explore the archive →</Link>
             </p>
@@ -102,13 +102,13 @@ export default async function HomePage() {
               .slice(0, 2)
               .map((d) => <ProgressCard key={d._id} entry={d} />)
           ) : (
-            <div className="empty-note">
+            <div className="empty-note" data-reveal="">
               <p>A record of the work between milestones.</p>
               <span>Monthly reflections and study notes will live here.</span>
             </div>
           )}
         </section>
-        <section className="section about-strip">
+        <section className="section about-strip" data-reveal="">
           <p className="eyebrow">A little context</p>
           <h2>
             Following the questions.

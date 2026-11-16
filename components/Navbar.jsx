@@ -29,6 +29,7 @@ function Navigation({ pathname }) {
     <header
       ref={header}
       className="site-header"
+      style={{ viewTransitionName: "site-header" }}
       onBlur={(e) => {
         if (open && !e.currentTarget.contains(e.relatedTarget)) setOpen(false);
       }}

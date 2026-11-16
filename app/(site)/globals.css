@@ -1488,6 +1488,101 @@ figcaption {
     }
   }
 }
+/* Entrance on load. The hero h1 (LCP) moves but is never transparent. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero .eyebrow,
+  .hero-subtitle,
+  .hero-description,
+  .hero .actions,
+  .currently {
+    animation: rise var(--dur-3) var(--ease-out) both;
+  }
+  .hero-subtitle {
+    animation-delay: 80ms;
+  }
+  .hero-description {
+    animation-delay: 140ms;
+  }
+  .hero .actions {
+    animation-delay: 200ms;
+  }
+  .currently {
+    animation-delay: 260ms;
+  }
+  .hero h1 {
+    animation: rise-solid var(--dur-3) var(--ease-out) both;
+  }
+  .page-heading > :not(h1),
+  .entry-header > :not(h1) {
+    animation: rise-light var(--dur-3) var(--ease-out) 60ms both;
+  }
+  .page-heading > h1,
+  .entry-header > h1 {
+    animation: rise-solid-light var(--dur-3) var(--ease-out) both;
+  }
+  [data-reveal="pending"] {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  [data-reveal="in"] {
+    transition:
+      opacity var(--dur-3) var(--ease-out),
+      transform var(--dur-3) var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 60ms);
+  }
+  ::view-transition-old(.page-out) {
+    animation: fade-out 160ms var(--ease-out) both;
+  }
+  ::view-transition-new(.page-in) {
+    animation: fade-in 220ms var(--ease-out) both;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes rise-solid {
+  from {
+    transform: translateY(10px);
+  }
+}
+@keyframes rise-light {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes rise-solid-light {
+  from {
+    transform: translateY(6px);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+/* Route transitions: the header stays put while page content crossfades. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
 @keyframes pulse {
   from {
     transform: scale(1);
@@ -1502,6 +1597,12 @@ figcaption {
   html {
     scroll-behavior: auto;
   }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
   *,
   *::before,
   *::after {
@@ -1510,6 +1611,10 @@ figcaption {
   }
 }
 @media print {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
   :root {
     color-scheme: light;
     --bg: #fff;

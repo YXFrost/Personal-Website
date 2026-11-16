@@ -32,12 +32,12 @@ export default async function ProgressPage() {
       </header>
       {entries.length > 0 && (
         <dl className="stats">
-          <div>
+          <div data-reveal="" style={{ "--i": 0 }}>
             <dt>Reflections</dt>
             <dd>{entries.length}</dd>
           </div>
           {logged.length > 0 && (
-            <div>
+            <div data-reveal="" style={{ "--i": 1 }}>
               <dt>
                 Hours recorded · {logged.length}{" "}
                 {logged.length === 1 ? "entry" : "entries"}
@@ -46,7 +46,7 @@ export default async function ProgressPage() {
             </div>
           )}
           {subjects.size > 0 && (
-            <div>
+            <div data-reveal="" style={{ "--i": 2 }}>
               <dt>Subjects explored</dt>
               <dd>{subjects.size}</dd>
             </div>
@@ -64,7 +64,7 @@ export default async function ProgressPage() {
           </section>
         ))}
       {!entries.length && (
-        <div className="empty-state">
+        <div className="empty-state" data-reveal="">
           <p className="eyebrow">No numbers for their own sake</p>
           <h2>Making room to reflect.</h2>
           <p>

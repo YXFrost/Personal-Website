@@ -4,7 +4,7 @@ import { entryPath } from "@/lib/utils.mjs";
 export default function ProjectCard({ entry, headingLevel = "h3" }) {
   const Heading = headingLevel;
   return (
-    <article className="project-card">
+    <article className="project-card" data-reveal="">
       <div className="project-preview">
         {entry.coverImage ? (
           <ResponsiveImage

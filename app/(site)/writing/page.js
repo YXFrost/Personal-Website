@@ -92,7 +92,7 @@ export default async function WritingPage({ searchParams }) {
           <ArticleCard headingLevel="h2" key={d._id} entry={d} />
         ))
       ) : (
-        <div className="empty-state">
+        <div className="empty-state" data-reveal="">
           <p className="eyebrow">An open page</p>
           <h2>
             {entries.length
