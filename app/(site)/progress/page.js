@@ -2,7 +2,14 @@ import { getEntries } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import ProgressCard from "@/components/ProgressCard";
 import ArchiveFilters, { ArchiveCount, readFilters } from "@/components/ArchiveFilters";
-import { facetCounts, filterEntries } from "@/lib/utils.mjs";
+import Link from "next/link";
+import HoursChart from "@/components/HoursChart";
+import {
+  facetCounts,
+  filterEntries,
+  hoursByMonth,
+  subjectTotals,
+} from "@/lib/utils.mjs";
 export const revalidate = 60;
 export const metadata = pageMetadata(
   "Progress",
@@ -15,6 +22,8 @@ export default async function ProgressPage({ searchParams }) {
   const subjectFacets = facetCounts(entries.flatMap((d) => d.subjects || []));
   const filtered = filterEntries(entries, active);
   const filtering = Boolean(active.q || active.tag);
+  const months = hoursByMonth(entries);
+  const totals = subjectTotals(entries);
   const logged = entries.filter((d) => typeof d.studyHours === "number");
   const total = logged.reduce((sum, d) => sum + d.studyHours, 0);
   const subjects = new Set(entries.flatMap((d) => d.subjects || []));
@@ -59,6 +68,25 @@ export default async function ProgressPage({ searchParams }) {
           )}
         </dl>
       )}
+      {totals.length > 0 && (
+        <div className="subject-totals" data-reveal="">
+          <h2>Hours logged alongside each subject</h2>
+          <ul>
+            {totals.map((t) => (
+              <li key={t.subject}>
+                <Link href={`/progress?tag=${encodeURIComponent(t.subject)}`}>
+                  {t.subject}
+                </Link>
+                <span>
+                  {t.logs} {t.logs === 1 ? "log" : "logs"}
+                  {t.hours > 0 && ` · ${t.hours.toLocaleString("en-GB")} h`}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <HoursChart months={months} />
       {entries.length > 0 && (
         <ArchiveFilters
           basePath="/progress"

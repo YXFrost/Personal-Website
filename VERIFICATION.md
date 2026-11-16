@@ -44,6 +44,18 @@ The root cause is not identified. It sits between Chromium and the local Next 16
 - Preview: the full browser suite passed once, against a manually started server. Runs through `npm run test:browser` hit the known stall. A server-side request log showed Next receiving a request (an RSC prefetch) and never answering it.
 - Not exercised: the error page (no way to trigger it without adding test code) and a real `seo.noindex: true` document (covered by the unit test only; no dataset writes).
 
+## Phases 2–6 checks (16 November 2026)
+
+Each phase ended with `npm run check` and the browser suite against real content and against preview content (on a manually started server and through `npm run test:browser`), all passing. Phase-specific checks were run with throwaway Playwright scripts that were not committed:
+
+- Phase 2: hover and focus states at 1280px (arrows, nav underline, card image zoom); no layout shift on hover. At 375px, closed menu links are not tabbable, and the menu animates open and closes on an outside tap or when focus leaves it. With reduced motion, `document.getAnimations()` returns 0 animations.
+- Phase 3: the hero `h1` is opaque at first paint and the entrance ends at 740 ms. Scroll reveal runs once and never re-hides. Nothing is hidden without JS or with reduced motion. Navigation runs a view transition while the header stays still. LCP did not regress (`/` about 250 ms; reading specimen about 340 ms, now the `h1`); CLS 0.
+- Phase 4: scrollspy follows scrolling and anchor clicks. The desktop TOC stays sticky. At 375px the TOC is collapsed and closes after a link is chosen. The progress bar tracks scroll. Copy writes the exact code (Windows returns CRLF line endings on read). Search shows aria-busy while pending and works without JS.
+- Phase 5: every tag on every preview route lands on a filtered archive with the right count, the tag in each result and a working clear link. Search keeps an active tag. Previous/next links appear only when a neighbor exists, and related projects show up only when a project shares a technology. Clicking a card's text still opens the entry.
+- Phase 6: chart bar heights are proportional to hours, each bar is reachable by keyboard with names like "August 2026: 42 hours", and nothing overflows at 320px. Real content (0 progress logs) shows only the empty state. The 0/1/2-log chart cases are covered by unit tests.
+
+Test changes since Phase 0: wait for the image dialog fade-out before asserting it is gone; open the collapsed TOC before clicking it at 390px; wait for finite time-based animations before each axe audit.
+
 ## Not verified
 
 - Lighthouse (not installed) and TBT. Real-device Core Web Vitals.

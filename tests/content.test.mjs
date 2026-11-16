@@ -15,6 +15,8 @@ import {
   filterEntries,
   facetCounts,
   adjacentEntries,
+  hoursByMonth,
+  subjectTotals,
 } from "../lib/utils.mjs";
 test("legacy project records retain their URLs, write-up, images and links", () => {
   const old = {
@@ -169,4 +171,31 @@ test("adjacent entries follow newest-first order and stop at the ends", () => {
   assert.deepEqual(adjacentEntries(list, "new"), { newer: null, older: list[1] });
   assert.deepEqual(adjacentEntries(list, "old"), { newer: list[1], older: null });
   assert.deepEqual(adjacentEntries(list, "missing"), { newer: null, older: null });
+});
+test("hours chart covers the twelve months up to the newest log", () => {
+  const log = (month, studyHours, subjects = []) => ({ month, studyHours, subjects, slug: month });
+  assert.deepEqual(hoursByMonth([]), []);
+  assert.deepEqual(hoursByMonth([log("2026-08-01", 42)]), []);
+  assert.deepEqual(hoursByMonth([log("2026-08-01", 42), { month: "2026-07-01", slug: "x" }]), []);
+  const months = hoursByMonth([log("2026-08-01", 42), log("2026-06-01", 18), log("2025-12-01", 24), log("2024-01-01", 99)]);
+  assert.equal(months.length, 12);
+  assert.equal(months[0].key, "2025-09");
+  assert.equal(months.at(-1).key, "2026-08");
+  assert.equal(months.at(-1).label, "August 2026");
+  assert.equal(months.at(-1).initial, "A");
+  assert.deepEqual(months.map((m) => m.hours), [null, null, null, 24, null, null, null, null, null, 18, null, 42]);
+  const two = hoursByMonth([log("2026-08-01", 10), log("2026-08-15", 5)]);
+  assert.equal(two.at(-1).hours, 15);
+});
+test("subject totals attribute a log's hours to each of its subjects", () => {
+  const totals = subjectTotals([
+    { subjects: ["Mathematics", "Literature"], studyHours: 42 },
+    { subjects: ["Mathematics"], studyHours: 24 },
+    { subjects: ["Physics", "Physics"] },
+  ]);
+  assert.deepEqual(totals, [
+    { subject: "Mathematics", logs: 2, hours: 66 },
+    { subject: "Literature", logs: 1, hours: 42 },
+    { subject: "Physics", logs: 1, hours: 0 },
+  ]);
 });

@@ -859,6 +859,108 @@ article:has(> .card-title:focus-visible) {
 }
 .progress-year {
   margin-block: 3rem;
+  border-left: 1px solid var(--border);
+  padding-left: 2rem;
+}
+/* Timeline rail: one outlined dot per log, level with its date stamp. */
+.progress-year .progress-card::before {
+  content: "";
+  position: absolute;
+  left: calc(-2rem - 4px);
+  top: 2.05rem;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--amber);
+  border-radius: 50%;
+  background: var(--bg);
+}
+.subject-totals {
+  margin-bottom: 3rem;
+}
+.subject-totals h2,
+.hours-chart-figure figcaption {
+  font: 0.72rem var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+.subject-totals ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0 2rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.subject-totals li {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  min-height: 44px;
+  border-bottom: 1px solid var(--border);
+  font: 0.75rem var(--mono);
+  color: var(--muted);
+}
+.subject-totals a {
+  color: var(--text);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.subject-totals a:hover {
+  color: var(--amber);
+}
+.hours-chart-figure {
+  margin: 0 0 3rem;
+}
+.hours-chart {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.hours-chart li {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+  min-width: 0;
+  margin: 0;
+}
+.hours-bar {
+  display: flex;
+  align-items: flex-end;
+  height: 8rem;
+  border-bottom: 1px solid var(--border);
+}
+.hours-fill {
+  display: block;
+  width: 100%;
+  height: calc(var(--h) * 100%);
+  min-height: 2px;
+  background: var(--muted);
+  transform-origin: bottom;
+}
+.is-latest .hours-fill {
+  background: var(--amber);
+}
+a.hours-bar:hover .hours-fill,
+a.hours-bar:focus-visible .hours-fill {
+  background: var(--text);
+}
+.is-latest a.hours-bar:hover .hours-fill,
+.is-latest a.hours-bar:focus-visible .hours-fill {
+  background: #f7cb82;
+}
+.hours-month {
+  text-align: center;
+  font: 0.6875rem var(--mono);
+  color: var(--muted);
 }
 .progress-year > h2 {
   font-family: var(--serif);
@@ -1363,6 +1465,18 @@ figcaption {
   .entry-pager {
     grid-template-columns: 1fr;
   }
+  .progress-year {
+    padding-left: 1rem;
+  }
+  .progress-year .progress-card::before {
+    left: calc(-1rem - 4px);
+  }
+  .hours-chart {
+    gap: 2px;
+  }
+  .hours-bar {
+    height: 6rem;
+  }
   .pager-newer {
     grid-column: 1;
   }
@@ -1553,6 +1667,13 @@ figcaption {
   .project-preview img,
   .article-preview img {
     transition: transform var(--dur-3) var(--ease-out);
+  }
+  .hours-chart-figure[data-reveal="pending"] .hours-fill {
+    transform: scaleY(0);
+  }
+  .hours-chart-figure[data-reveal="in"] .hours-fill {
+    transition: transform var(--dur-3) var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 30ms);
   }
   .toc a {
     transition:

@@ -401,6 +401,65 @@
     "body": []
   },
   {
+    "_id": "preview-progress-june",
+    "_type": "progress",
+    "title": "A slower month",
+    "slug": {
+      "current": "sample-june"
+    },
+    "summary": "A fictional monthly log for testing the hours chart and timeline. These are not the owner’s study records.",
+    "publishedAt": "2026-07-01",
+    "month": "2026-06-01",
+    "studyHours": 18,
+    "subjects": [
+      "Mathematics",
+      "Physics"
+    ],
+    "reflections": [
+      "Specimen text: one sentence of reflection so the card has content."
+    ],
+    "body": []
+  },
+  {
+    "_id": "preview-progress-may",
+    "_type": "progress",
+    "title": "Starting a reading list",
+    "slug": {
+      "current": "sample-may"
+    },
+    "summary": "A fictional monthly log for testing the hours chart and timeline. These are not the owner’s study records.",
+    "publishedAt": "2026-06-01",
+    "month": "2026-05-01",
+    "studyHours": 30,
+    "subjects": [
+      "Literature",
+      "Philosophy"
+    ],
+    "reflections": [
+      "Specimen text: one sentence of reflection so the card has content."
+    ],
+    "body": []
+  },
+  {
+    "_id": "preview-progress-december",
+    "_type": "progress",
+    "title": "Looking back on the year",
+    "slug": {
+      "current": "sample-december"
+    },
+    "summary": "A fictional monthly log for testing the hours chart and timeline. These are not the owner’s study records.",
+    "publishedAt": "2026-01-02",
+    "month": "2025-12-01",
+    "studyHours": 24,
+    "subjects": [
+      "Mathematics"
+    ],
+    "reflections": [
+      "Specimen text: one sentence of reflection so the card has content."
+    ],
+    "body": []
+  },
+  {
     "_id": "preview-gallery",
     "_type": "project",
     "title": "Project gallery specimen",
