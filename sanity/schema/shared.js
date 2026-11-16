@@ -43,7 +43,7 @@ export const core = [
     type: "boolean",
     initialValue: true,
     description:
-      "Uncheck to hide a published document. Sanity drafts are always excluded.",
+      "Hides the entry from this website only. It is still readable through the public Sanity API; keep private material as a draft.",
   },
   {
     name: "publishedAt",
@@ -64,6 +64,12 @@ export const seo = {
     { name: "title", type: "string" },
     { name: "description", type: "text", rows: 3 },
     image("image"),
+    {
+      name: "noindex",
+      title: "Hide from search engines, sitemap and feed",
+      type: "boolean",
+      initialValue: false,
+    },
   ],
 };
 export const references = {

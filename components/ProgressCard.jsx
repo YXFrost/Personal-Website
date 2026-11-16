@@ -20,11 +20,13 @@ export default function ProgressCard({ entry }) {
           </Link>
         </h3>
         <p>{entry.summary}</p>
-        <ul className="tags" aria-label="Subjects">
-          {(entry.subjects || []).map((s) => (
-            <li key={s}>{s}</li>
-          ))}
-        </ul>
+        {entry.subjects?.length > 0 && (
+          <ul className="tags" aria-label="Subjects">
+            {entry.subjects.map((s) => (
+              <li key={s}>{s}</li>
+            ))}
+          </ul>
+        )}
       </div>
     </article>
   );

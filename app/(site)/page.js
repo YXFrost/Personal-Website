@@ -8,11 +8,10 @@ import ArticleCard from "@/components/ArticleCard";
 import ProjectCard from "@/components/ProjectCard";
 import ProgressCard from "@/components/ProgressCard";
 export const revalidate = 60;
-export const metadata = pageMetadata(
-  "A personal notebook",
-  site.description,
-  "/",
-);
+const homeTitle = `${site.name} — A personal notebook`;
+const baseMetadata = pageMetadata(homeTitle, site.description, "/");
+// The layout's title.template does not apply to a page in the same segment.
+export const metadata = { ...baseMetadata, title: { absolute: homeTitle } };
 export default async function HomePage() {
   const [writing, projects, progress] = await Promise.all(
     ["writing", "project", "progress"].map(getEntries),
@@ -20,13 +19,21 @@ export default async function HomePage() {
   const featured = [...writing, ...projects]
     .filter((d) => d.featured)
     .slice(0, 2);
+  // Number only the sections that render, so the sequence always starts at 01.
+  const order = [
+    featured.length > 0 && "featured",
+    "writing",
+    "projects",
+    "progress",
+  ].filter(Boolean);
+  const number = (key) => String(order.indexOf(key) + 1).padStart(2, "0");
   return (
     <>
       <HeroSection />
       <div className="container home-content">
         {featured.length > 0 && (
           <section className="section">
-            <SectionHeading number="01" title="Worth a closer look" />
+            <SectionHeading number={number("featured")} title="Worth a closer look" />
             <div className="featured-grid">
               {featured.map((d) =>
                 d._type === "writing" ? (
@@ -40,7 +47,7 @@ export default async function HomePage() {
         )}
         <section className="section" id="writing">
           <SectionHeading
-            number="02"
+            number={number("writing")}
             title="Recent writing"
             href="/writing"
             linkText="All writing"
@@ -61,7 +68,7 @@ export default async function HomePage() {
         </section>
         <section className="section" id="projects">
           <SectionHeading
-            number="03"
+            number={number("projects")}
             title="Things I’m building"
             href="/projects"
             linkText="All projects"
@@ -82,7 +89,7 @@ export default async function HomePage() {
         </section>
         <section className="section progress-section">
           <SectionHeading
-            number="04"
+            number={number("progress")}
             title="Learning, in progress"
             href="/progress"
             linkText="The archive"

@@ -20,7 +20,7 @@ export default async function ProgressPage() {
   return (
     <div className="container archive">
       <header className="page-heading">
-        <p className="eyebrow">03 / The learning archive</p>
+        <p className="eyebrow">The learning archive</p>
         <h1>
           Progress<span>.</span>
         </h1>

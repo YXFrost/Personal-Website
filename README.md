@@ -54,6 +54,10 @@ Set `SITE_URL` to your actual HTTPS public origin in local/Vercel environments. 
 
 `CONTENT_PREVIEW=1` enables explicitly labeled fictional layout specimens, including old-schema content. It excludes them from RSS/sitemap and sets noindex. It does not preview your Sanity drafts.
 
+### Privacy
+
+"Visible on website" hides an entry from this site only. The site reads the dataset without a token, so the dataset is public: anyone with the project ID can fetch hidden documents through the Sanity API. Only Sanity drafts are private, so keep private material as a draft. "Hide from search engines, sitemap and feed" (under Search and sharing) adds a noindex tag to the entry's page and leaves it out of `sitemap.xml` and the RSS feed. The entry is still public on the site. Both default to off.
+
 Old monthly updates and essays will remain under Projects until YOU choose which documents to reclassify. This is deliberate: the repository archive did not contain the actual Sanity dataset. The optional `scripts/migrate-content.mjs` works only on local exported data, but is not part of installation; do not run a CMS import without reviewing its output and backing up the dataset. No redirects are active until you explicitly populate `content/legacy-routes.json`.
 
 ## Deployment

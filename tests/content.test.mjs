@@ -10,6 +10,8 @@ import {
   escapeXml,
   jsonLd,
   entryPath,
+  getHeadings,
+  isIndexable,
 } from "../lib/utils.mjs";
 test("legacy project records retain their URLs, write-up, images and links", () => {
   const old = {
@@ -106,4 +108,34 @@ test('offline migration preserves originals and generates explicit URL redirects
     assert.equal(migrated._id,'progress.log-1');assert.equal(migrated._type,'progress');assert.deepEqual(migrated.body,original.longDescription);assert.deepEqual(migrated.coverImage,original.image);
     assert.deepEqual(JSON.parse(readFileSync(join(dir,'legacy-routes.json'))),[{source:'/projects/january',destination:'/progress/january'}]);
   } finally {rmSync(dir,{recursive:true,force:true});}
+});
+test("legacy h1 sections appear in the table of contents as h2", () => {
+  const block = (style, text, _key) => ({ _type: "block", style, _key, children: [{ text }] });
+  const headings = getHeadings([
+    block("h1", "Part one", "a"),
+    block("normal", "Body text", "b"),
+    block("h1", "Part two", "c"),
+    block("h3", "Detail", "d"),
+    block("h2", "Part three", "e"),
+    block("h4", "Too deep", "f"),
+    { _type: "code", code: "x" },
+  ]);
+  assert.deepEqual(headings, [
+    { id: "section-a", title: "Part one", level: "h2" },
+    { id: "section-c", title: "Part two", level: "h2" },
+    { id: "section-d", title: "Detail", level: "h3" },
+    { id: "section-e", title: "Part three", level: "h2" },
+  ]);
+});
+test("entries marked noindex are excluded from sitemap and feed filters", () => {
+  const entries = [
+    { slug: "open" },
+    { slug: "seo-empty", seo: {} },
+    { slug: "hidden", seo: { noindex: true } },
+    { slug: "explicit", seo: { noindex: false } },
+  ];
+  assert.deepEqual(
+    entries.filter(isIndexable).map((d) => d.slug),
+    ["open", "seo-empty", "explicit"],
+  );
 });

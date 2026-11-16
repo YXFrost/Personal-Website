@@ -3,11 +3,7 @@ import { PortableText } from "@portabletext/react";
 import ResponsiveImage from "./ResponsiveImage";
 import CodeBlock from "./CodeBlock";
 import { headingId, safeUrl, textOf } from "@/lib/utils.mjs";
-export function getHeadings(body = []) {
-  return body
-    .filter((b) => b._type === "block" && ["h2", "h3"].includes(b.style))
-    .map((b) => ({ id: headingId(b), title: textOf(b), level: b.style }));
-}
+export { getHeadings } from "@/lib/utils.mjs";
 export default async function ArticleRenderer({ body = [] }) {
   const hasMath = body.some(
     (b) =>

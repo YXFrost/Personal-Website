@@ -7,7 +7,7 @@ export default function AboutPage() {
   return (
     <div className="container archive about-page">
       <header className="page-heading">
-        <p className="eyebrow">04 / Behind the notebook</p>
+        <p className="eyebrow">Behind the notebook</p>
         <h1>
           Always a student<span>.</span>
         </h1>

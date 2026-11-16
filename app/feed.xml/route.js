@@ -1,9 +1,9 @@
 import { getEntries } from "@/lib/content";
 import { site, absoluteUrl, preview } from "@/lib/site";
-import { entryPath, escapeXml as x } from "@/lib/utils.mjs";
+import { entryPath, isIndexable, escapeXml as x } from "@/lib/utils.mjs";
 export const revalidate = 60;
 export async function GET() {
-  const entries = preview ? [] : await getEntries("writing");
+  const entries = preview ? [] : (await getEntries("writing")).filter(isIndexable);
   const items = entries
     .map(
       (d) =>

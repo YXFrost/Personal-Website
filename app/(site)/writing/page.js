@@ -31,7 +31,7 @@ export default async function WritingPage({ searchParams }) {
   return (
     <div className="container archive">
       <header className="page-heading">
-        <p className="eyebrow">01 / The publication</p>
+        <p className="eyebrow">The publication</p>
         <h1>
           Writing<span>.</span>
         </h1>

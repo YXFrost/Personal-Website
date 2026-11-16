@@ -31,11 +31,13 @@ export default function ProjectCard({ entry, headingLevel = "h3" }) {
           </Link>
         </Heading>
         <p>{entry.summary}</p>
-        <ul className="tags" aria-label="Technologies">
-          {entry.technologies.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
+        {entry.technologies.length > 0 && (
+          <ul className="tags" aria-label="Technologies">
+            {entry.technologies.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        )}
       </div>
     </article>
   );

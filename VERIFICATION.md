@@ -37,6 +37,13 @@ On this machine, with a freshly started `next start` serving the preview build, 
 
 The root cause is not identified. It sits between Chromium and the local Next 16.3.5 server, not in site code. Production on Vercel uses a different image service and was not tested.
 
+## Phase 1 checks (16 November 2026)
+
+- `npm run check`: 10/10 unit tests (new: legacy `h1` headings in the TOC, `seo.noindex` filter).
+- Real content: browser suite passed (36 layouts, 6 axe audits, 0 violations). Home title is "YN — A personal notebook". Home sections are numbered 01–03 with no featured entry (01–04 in preview, which has one). No empty `ul.tags` on any route. The Crime and Punishment essay now shows a TOC. No visible text under 11px at 375px on the routes checked.
+- Preview: the full browser suite passed once, against a manually started server. Runs through `npm run test:browser` hit the known stall. A server-side request log showed Next receiving a request (an RSC prefetch) and never answering it.
+- Not exercised: the error page (no way to trigger it without adding test code) and a real `seo.noindex: true` document (covered by the unit test only; no dataset writes).
+
 ## Not verified
 
 - Lighthouse (not installed) and TBT. Real-device Core Web Vitals.

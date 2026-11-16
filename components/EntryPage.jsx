@@ -30,6 +30,7 @@ export default async function EntryPage({ type, slug }) {
   const entry = await getEntry(type, slug);
   if (!entry) notFound();
   const headings = getHeadings(entry.body);
+  const entryTags = (type === "project" ? entry.technologies : entry.tags) || [];
   const toc = headings.length >= 4;
   const related =
     type === "writing"
@@ -79,8 +80,8 @@ export default async function EntryPage({ type, slug }) {
           <p className="entry-summary">{entry.summary}</p>
           <div className="meta">
             {entry.publishedAt && (
-              <time dateTime={entry.publishedAt}>
-                {formatDate(entry.publishedAt)}
+              <time dateTime={entry.month || entry.publishedAt}>
+                {formatDate(entry.month || entry.publishedAt, Boolean(entry.month))}
               </time>
             )}
             {type === "writing" && <span>{entry.readingTime} min read</span>}
@@ -88,14 +89,16 @@ export default async function EntryPage({ type, slug }) {
               <span>Updated {formatDate(entry.updatedAt)}</span>
             )}
           </div>
-          <ul
-            className="tags"
-            aria-label={type === "project" ? "Technologies" : "Tags"}
-          >
-            {(type === "project" ? entry.technologies : entry.tags).map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
+          {entryTags.length > 0 && (
+            <ul
+              className="tags"
+              aria-label={type === "project" ? "Technologies" : "Tags"}
+            >
+              {entryTags.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          )}
           {type === "project" && (
             <div className="actions">
               {safeUrl(entry.githubUrl) && (

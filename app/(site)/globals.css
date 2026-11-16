@@ -196,7 +196,7 @@ figcaption {
   font-family: var(--mono);
 }
 .eyebrow {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--amber);
@@ -206,7 +206,7 @@ figcaption {
   flex-wrap: wrap;
   gap: 0.5rem 1rem;
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   line-height: 1.65;
 }
 .accent {
@@ -385,7 +385,7 @@ figcaption {
 .currently dt {
   text-transform: capitalize;
   color: var(--muted);
-  font: 0.68rem var(--mono);
+  font: 0.6875rem var(--mono);
   margin-bottom: 0.4rem;
 }
 .currently dd {
@@ -394,7 +394,7 @@ figcaption {
   margin: 0;
 }
 .updated {
-  font: 0.62rem/1.7 var(--mono);
+  font: 0.6875rem/1.7 var(--mono);
   color: var(--muted);
   padding-top: 1.5rem;
   margin-top: 1.7rem;
@@ -404,7 +404,7 @@ figcaption {
   display: flex;
   justify-content: space-between;
   color: var(--muted);
-  font: 0.64rem/1.6 var(--mono);
+  font: 0.6875rem/1.6 var(--mono);
   padding-block: 1.15rem;
   border-top: 1px solid var(--border);
 }
@@ -521,7 +521,7 @@ article:has(> .card-title:focus-visible) {
   padding: 0;
   margin: 1.1rem 0 0;
   color: var(--muted);
-  font-size: 0.63rem;
+  font-size: 0.72rem;
 }
 .tags li {
   margin: 0;
@@ -625,7 +625,7 @@ article:has(> .card-title:focus-visible) {
   margin-top: 0.4rem;
 }
 .progress-stamp small {
-  font: 0.65rem var(--mono);
+  font: 0.6875rem var(--mono);
   color: var(--muted);
 }
 .about-strip {
@@ -658,7 +658,7 @@ article:has(> .card-title:focus-visible) {
 }
 .site-footer p,
 .site-footer small {
-  font: 0.65rem/1.8 var(--mono);
+  font: 0.6875rem/1.8 var(--mono);
   color: var(--muted);
 }
 .site-footer ul {
@@ -785,7 +785,7 @@ article:has(> .card-title:focus-visible) {
   gap: 1.5rem;
 }
 .stats dt {
-  font: 0.68rem/1.5 var(--mono);
+  font: 0.6875rem/1.5 var(--mono);
   color: var(--muted);
 }
 .stats dd {
@@ -869,7 +869,7 @@ article:has(> .card-title:focus-visible) {
   background: var(--surface);
 }
 figcaption {
-  font-size: 0.68rem;
+  font-size: 0.6875rem;
   line-height: 1.7;
   color: var(--muted);
   margin-top: 0.75rem;
@@ -896,7 +896,7 @@ figcaption {
   padding: 0.5rem;
 }
 .toc h2 {
-  font: 0.65rem var(--mono);
+  font: 0.6875rem var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted);
@@ -1074,7 +1074,7 @@ figcaption {
   font-weight: 400;
 }
 .progress-facts span {
-  font: 0.68rem/1.7 var(--mono);
+  font: 0.6875rem/1.7 var(--mono);
   color: var(--muted);
 }
 .reading-body > section {

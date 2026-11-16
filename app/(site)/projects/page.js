@@ -12,7 +12,7 @@ export default async function ProjectsPage() {
   return (
     <div className="container archive">
       <header className="page-heading">
-        <p className="eyebrow">02 / The workbench</p>
+        <p className="eyebrow">The workbench</p>
         <h1>
           Projects<span>.</span>
         </h1>
