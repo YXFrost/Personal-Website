@@ -318,6 +318,10 @@ html:has([data-link-pending]) .site-header::after {
 .menu-toggle::-webkit-details-marker {
   display: none;
 }
+.menu-indicator {
+  inline-size: 1em;
+  text-align: center;
+}
 .menu-indicator::before {
   content: "+";
 }
@@ -356,15 +360,16 @@ html:has([data-link-pending]) .site-header::after {
   );
   mask-image: radial-gradient(ellipse at 61% 52%, #000 7%, transparent 64%);
 }
-/* Pointer glow: a warm wash plus amber grid lines, both centred on the pointer. */
-.hero-glow {
+/* Light up a patch of the background grid under the pointer. */
+.pointer-glow {
   display: none;
 }
 .hero > .container {
   position: relative;
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .hero-glow {
+  .pointer-glow {
+    --glow-ink: var(--section-ink, 238 185 94);
     display: block;
     position: absolute;
     inset: 0;
@@ -372,17 +377,17 @@ html:has([data-link-pending]) .site-header::after {
     opacity: 0;
     transition: opacity var(--dur-2) var(--ease-out);
     background:
-      radial-gradient(circle 120px at var(--mx, 50%) var(--my, 50%), rgb(238 185 94 / .14), transparent 80%),
-      radial-gradient(ellipse 400px 290px at var(--mx, 50%) var(--my, 50%), rgb(238 185 94 / .075), transparent 78%);
+      radial-gradient(circle 120px at var(--mx, 50%) var(--my, 50%), rgb(var(--glow-ink) / .14), transparent 80%),
+      radial-gradient(ellipse 400px 290px at var(--mx, 50%) var(--my, 50%), rgb(var(--glow-ink) / .075), transparent 78%);
   }
-  .hero-glow::after {
+  .pointer-glow::after {
     content: "";
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgb(238 185 94 / .55) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(238 185 94 / .55) 1px, transparent 1px);
-    background-size: 48px 48px;
+      linear-gradient(rgb(var(--glow-ink) / .55) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--glow-ink) / .55) 1px, transparent 1px);
+    background-size: var(--masthead-grid, 48px) var(--masthead-grid, 48px);
     -webkit-mask-image: radial-gradient(
       circle 200px at var(--mx, 50%) var(--my, 50%),
       #000,
@@ -394,7 +399,7 @@ html:has([data-link-pending]) .site-header::after {
       transparent
     );
   }
-  .hero-glow[data-active="true"] {
+  .pointer-glow[data-active="true"] {
     opacity: 1;
   }
 }
@@ -977,12 +982,16 @@ article:has(> .card-title:focus-visible) {
   background: linear-gradient(180deg, var(--section-wash), var(--bg) 54rem);
 }
 .section-masthead {
+  --masthead-grid: 44px;
   position: relative;
   isolation: isolate;
   border-bottom: 1px solid rgb(var(--section-ink) / .25);
   background:
     radial-gradient(ellipse at 83% 60%, var(--section-wash), transparent 65%),
     var(--bg);
+}
+.section-masthead > .pointer-glow {
+  z-index: -1;
 }
 .section-masthead .section-description {
   max-width: 41ch;
@@ -1016,233 +1025,15 @@ article:has(> .card-title:focus-visible) {
   background:
     linear-gradient(rgb(var(--section-ink) / .10) 1px, transparent 1px),
     linear-gradient(90deg, rgb(var(--section-ink) / .10) 1px, transparent 1px);
-  background-size: 44px 44px;
+  background-size: var(--masthead-grid) var(--masthead-grid);
   mask-image: linear-gradient(90deg, transparent 8%, #000 92%);
 }
 .section-art-detail {
-  --drift: 4.5rem;
-  inset: -22% 0 -30% 47%;
-}
-.writing-page .section-art-detail {
-  rotate: -13deg;
-}
-.writing-page .section-art-detail::before,
-.writing-page .section-art-detail::after {
-  content: "";
-  position: absolute;
-  width: 54%;
-  height: 77%;
-  border: 1px solid rgb(var(--section-ink) / .31);
-  inset: 7% auto auto 30%;
-}
-.writing-page .section-art-detail::after {
-  inset: 14% auto auto 22%;
-  background:
-    linear-gradient(90deg, transparent 12%, rgb(var(--section-ink) / .22) 12% calc(12% + 1px), transparent calc(12% + 1px)),
-    repeating-linear-gradient(transparent 0 27px, rgb(var(--section-ink) / .21) 28px 29px),
-    #241d15;
-}
-.projects-page .section-art-detail {
-  rotate: -18deg;
-  inset-inline: 54% -4%;
-}
-.projects-page .section-art-detail::before,
-.projects-page .section-art-detail::after {
-  content: "";
-  position: absolute;
-  inset: 9% 13% 11% 8%;
-  border: 1px solid rgb(var(--section-ink) / .35);
-  box-shadow: 0 0 0 24px rgb(var(--section-ink) / .03);
-}
-.projects-page .section-art-detail::after {
-  inset: 18% 4% 3% 19%;
-  border-style: dashed;
-}
-.progress-page .section-art-detail {
-  inset-inline: 43% -8%;
-  background:
-    radial-gradient(circle, rgb(var(--section-ink) / .52) 1px, transparent 2px) 0 0 / 20px 20px,
-    repeating-radial-gradient(ellipse at 66% 66%, transparent 0 43px, rgb(var(--section-ink) / .26) 44px 45px);
-  mask-image: radial-gradient(ellipse at 68% 58%, #000 6%, transparent 65%);
-}
-.about-page .section-art-detail {
-  rotate: -16deg;
-  inset-inline: 40% -15%;
-}
-/* The ellipse ratio is measured by SectionArt so it matches the original farthest-side rings. */
-.about-rings {
-  --ring-ratio: .5;
-  position: absolute;
-  inset: 0;
-  background: repeating-radial-gradient(
-    ellipse 100px calc(100px * var(--ring-ratio)) at 63% 54%,
-    transparent 0 32px,
-    rgb(var(--section-ink) / .30) 33px 34px,
-    transparent 35px 38px
-  );
-  mask-image: radial-gradient(ellipse at 65% 55%, #000 10%, transparent 68%);
-}
-/* Planets: x and y run as two eased sine waves a quarter-period apart, tracing the ellipse. */
-.orbit {
-  --ry: calc(var(--rx) * var(--ring-ratio));
-  position: absolute;
-  left: 63%;
-  top: 54%;
-  transform: translateX(calc(var(--rx) * var(--cos)));
-}
-.orbit-y {
-  display: block;
-  transform: translateY(calc(var(--ry) * var(--sin)));
-}
-.planet {
-  position: absolute;
-  width: var(--size);
-  height: var(--size);
-  margin: calc(var(--size) / -2);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff1d6, rgb(var(--section-ink)) 55%, #8a5a2c);
-  box-shadow: 0 0 calc(var(--size) * 1.6) rgb(var(--section-ink) / .55);
-}
-.planet.has-moon::after {
-  content: "";
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  left: 50%;
-  top: 50%;
-  margin: -1.5px;
-  border-radius: 50%;
-  background: #f6dcb6;
-  transform: rotate(40deg) translateX(13px);
-}
-
-/* Writing: lines of "words" written onto the front sheet. */
-.writing-ink {
-  position: absolute;
-  z-index: 1;
-  left: 22%;
-  top: 14%;
-  width: 54%;
-  height: 77%;
-  overflow: hidden;
-}
-.ink-page {
-  position: absolute;
-  inset: 0;
-}
-.ink-page > span {
-  --written: clamp(0, var(--ink) * 16 - var(--i) * 1.1, 1);
-  clip-path: inset(0 calc(100% - 100% * var(--written)) 0 0);
-  position: absolute;
-  left: 15%;
-  top: calc(29px * var(--row) - 9px);
-  width: calc(var(--width) * .8);
-  height: 2px;
-  border-radius: 2px;
-  opacity: .5;
-  background: repeating-linear-gradient(
-    90deg,
-    rgb(var(--section-ink)) 0 var(--word),
-    transparent var(--word) calc(var(--word) + 7px)
-  );
-}
-
-/* Projects: a drafting head traces the solid frame while a scan passes across the sheet. */
-.draft {
-  position: absolute;
-  inset: 9% 13% 11% 8%;
-}
-.draft-edge {
-  position: absolute;
-  opacity: 0;
-  background: rgb(var(--section-ink) / .9);
-  box-shadow: 0 0 6px rgb(var(--section-ink) / .6);
-}
-.draft-top { top: -1px; left: 0; width: 100%; height: 1px; transform-origin: left; }
-.draft-right { top: 0; right: -1px; width: 1px; height: 100%; transform-origin: top; }
-.draft-bottom { bottom: -1px; left: 0; width: 100%; height: 1px; transform-origin: right; }
-.draft-left { top: 0; left: -1px; width: 1px; height: 100%; transform-origin: bottom; }
-.draft-head {
-  position: absolute;
-  inset: 0;
-}
-.draft-head::before,
-.draft-head::after {
-  content: "";
-  position: absolute;
-  left: -9px;
-  top: -9px;
-  width: 18px;
-  height: 18px;
-}
-.draft-head::before {
-  border-radius: 50%;
-  border: 1px solid rgb(var(--section-ink) / .85);
-  box-shadow: 0 0 10px rgb(var(--section-ink) / .45);
-}
-.draft-head::after {
-  background:
-    linear-gradient(rgb(var(--section-ink)) 0 0) center / 1px 100% no-repeat,
-    linear-gradient(rgb(var(--section-ink)) 0 0) center / 100% 1px no-repeat;
-  transform: scale(1.7);
-}
-.draft-scan {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 18%;
-  opacity: 0;
-  background: linear-gradient(90deg, transparent, rgb(var(--section-ink) / .09) 70%, rgb(var(--section-ink) / .32) 98%, transparent);
-}
-
-/* Progress: current runs along the grid lines out from a charge near the dot field. */
-.progress-page .section-art-grid {
-  --cx: round(nearest, 86%, 44px);
-  --cy: round(nearest, 66%, 44px);
-}
-.field-glow,
-.field-wave {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  background:
-    linear-gradient(rgb(var(--section-ink) / .7) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--section-ink) / .7) 1px, transparent 1px);
-  background-size: 44px 44px;
-}
-.field-glow {
-  opacity: .32;
-  mask-image: radial-gradient(circle 15rem at var(--cx) var(--cy), #000, transparent 72%);
-}
-.field-current,
-.field-node {
-  position: absolute;
-  opacity: 0;
-}
-.field-current-x {
-  left: var(--cx);
-  top: calc(var(--cy) + 44px * var(--offset));
-  width: 72px;
-  height: 1px;
-  transform-origin: left;
-  background: linear-gradient(90deg, transparent, rgb(var(--section-ink) / .9) 75%, #e8fff5);
-  box-shadow: 0 0 6px rgb(var(--section-ink) / .8);
-}
-.field-current-y {
-  left: calc(var(--cx) + 44px * var(--offset));
-  top: var(--cy);
-  width: 1px;
-  height: 72px;
-  transform-origin: top;
-  background: linear-gradient(180deg, transparent, rgb(var(--section-ink) / .9) 75%, #e8fff5);
-  box-shadow: 0 0 6px rgb(var(--section-ink) / .8);
-}
-.field-node {
-  left: calc(var(--cx) + 44px * var(--col) - 4px);
-  top: calc(var(--cy) + 44px * var(--row) - 4px);
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #e8fff5, rgb(var(--section-ink) / .8) 35%, transparent 70%);
+  --drift: 3rem;
+  inset: 0 var(--gutter) 0 auto;
+  width: min(56%, 48rem);
+  display: grid;
+  align-items: center;
 }
 .writing-page .archive-results {
   display: grid;
@@ -2045,21 +1836,31 @@ figcaption {
     grid-template-columns: minmax(0, 1fr);
     gap: 3rem;
   }
-  .section-art {
-    opacity: .68;
-  }
+  /* Keep the artwork at its drawing size and crop it to the masthead on phones. */
   .section-art-detail {
-    transform: translateX(12%);
+    --drift: 1.25rem;
+    inset: 0;
+    width: auto;
   }
-  .writing-page .section-art-detail {
-    inset-inline: 36% -27%;
+  .section-art-detail .masthead-art {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 35rem);
+    height: max(100%, 20rem);
+    max-width: none;
+    translate: -50% -50%;
   }
-  .projects-page .section-art-detail {
-    inset-inline: 53% -20%;
-  }
-  .progress-page .section-art-detail,
-  .about-page .section-art-detail {
-    inset-inline: 29% -37%;
+  .section-art::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--bg) 76%, transparent),
+      color-mix(in srgb, var(--bg) 52%, transparent) 55%,
+      color-mix(in srgb, var(--bg) 22%, transparent)
+    );
   }
   .entry-header h1 {
     font-size: clamp(2.3rem, 7vw, 3.5rem);
@@ -2111,6 +1912,36 @@ figcaption {
     border-bottom: 1px solid var(--border);
     max-height: calc(100dvh - var(--header-height));
     overflow-y: auto;
+  }
+  @supports selector(details::details-content) {
+    .mobile-nav .nav-links {
+      position: static;
+    }
+    .mobile-nav::details-content {
+      position: absolute;
+      inset: 100% 0 auto;
+      content-visibility: hidden;
+      opacity: 0;
+      translate: 0 -.375rem;
+      pointer-events: none;
+    }
+    .mobile-nav[open]::details-content {
+      content-visibility: visible;
+      opacity: 1;
+      translate: 0;
+      pointer-events: auto;
+    }
+    .mobile-nav:not([open]) .nav-links {
+      interactivity: inert;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .mobile-nav::details-content {
+        transition:
+          opacity 180ms ease-out,
+          translate 180ms var(--ease-out),
+          content-visibility 180ms allow-discrete;
+      }
+    }
   }
   .nav-links a {
     padding: 0.5rem 0.75rem;
@@ -2432,20 +2263,6 @@ figcaption {
       animation: light-pass 700ms var(--ease-out) both;
     }
   }
-  @media (max-width: 40rem) {
-    .mobile-nav[data-motion][open] .nav-links {
-      animation: menu-in 300ms var(--ease-out) both;
-    }
-    .mobile-nav[data-motion][open] .nav-links li {
-      animation: menu-item-in 340ms var(--ease-out) both;
-    }
-    .mobile-nav[data-motion][open] .nav-links li:nth-child(2) { animation-delay: 34ms; }
-    .mobile-nav[data-motion][open] .nav-links li:nth-child(3) { animation-delay: 68ms; }
-    .mobile-nav[data-motion][open] .nav-links li:nth-child(4) { animation-delay: 102ms; }
-    .mobile-nav[data-motion][open] .nav-links:focus-within li {
-      animation: none;
-    }
-  }
   ::view-transition-old(.page-out) {
     animation: page-exit 130ms var(--ease-out) both;
   }
@@ -2540,109 +2357,6 @@ figcaption {
     animation-play-state: paused;
   }
 
-  /* About: rings open outward, then planets orbit on them. */
-  .about-rings {
-    animation: rings-open 1100ms var(--ease-out) both;
-  }
-  .orbit {
-    animation: orbit-x calc(var(--period) / 2) cubic-bezier(.37, 0, .63, 1) var(--phase) infinite alternate;
-  }
-  .orbit-y {
-    animation: orbit-y calc(var(--period) / 2) cubic-bezier(.37, 0, .63, 1) calc(var(--phase) - var(--period) / 4) infinite alternate;
-  }
-  .planet {
-    animation: planet-in 700ms var(--ease-out) 500ms both;
-  }
-
-  /* Writing: the two sheets slide into place, then the front sheet is written line by line. */
-  .writing-page .section-art-detail::before {
-    animation: sheet-in 800ms var(--ease-out) both;
-  }
-  .writing-page .section-art-detail::after,
-  .writing-ink {
-    --sheet-from: translate(5%, 9%) rotate(3deg);
-    animation: sheet-in 900ms var(--ease-out) 90ms both;
-  }
-  .ink-page {
-    animation: ink-page 16s linear 700ms infinite both;
-  }
-
-  /* Projects: frames are drafted in, then a plotter keeps retracing the outline. */
-  .projects-page .section-art-detail::before {
-    animation: frame-draft 900ms var(--ease-out) both;
-  }
-  .projects-page .section-art-detail::after {
-    animation: frame-draft 900ms var(--ease-out) 160ms both;
-  }
-  .draft-edge,
-  .draft-head {
-    animation: 7s cubic-bezier(.45, 0, .55, 1) 900ms infinite both;
-  }
-  .draft-top { animation-name: trace-top; }
-  .draft-right { animation-name: trace-right; }
-  .draft-bottom { animation-name: trace-bottom; }
-  .draft-left { animation-name: trace-left; }
-  .draft-head { animation-name: plot; }
-  .draft-scan {
-    animation: scan 9s cubic-bezier(.45, 0, .55, 1) 1.4s infinite both;
-  }
-
-  /* Progress: the grid powers on, then pulses and current ripple out from the charge. */
-  .field-glow {
-    animation: field-flicker 4.2s linear infinite both;
-  }
-  @supports (mask-image: radial-gradient(circle 1px, #000, transparent)) {
-    .field-wave {
-      mask-image: radial-gradient(
-        circle at var(--cx) var(--cy),
-        transparent calc(var(--wave) - 5rem),
-        #000 calc(var(--wave) - .5rem),
-        transparent var(--wave)
-      );
-      animation: field-wave 3.6s cubic-bezier(.2, .6, .35, 1) 200ms infinite both;
-    }
-  }
-  .progress-page .section-art-grid > .field-current,
-  .progress-page .section-art-grid > .field-node {
-    animation-duration: var(--duration);
-    animation-delay: var(--delay);
-    animation-iteration-count: infinite;
-    animation-fill-mode: both;
-  }
-  .field-current-x {
-    animation-name: current-x;
-    animation-timing-function: cubic-bezier(.5, 0, .9, .6);
-  }
-  .field-current-y {
-    animation-name: current-y;
-    animation-timing-function: cubic-bezier(.5, 0, .9, .6);
-  }
-  .field-node {
-    animation-name: node-spark;
-    animation-timing-function: linear;
-  }
-  .progress-page .section-art-grid {
-    animation: grid-power 900ms steps(1, end) both;
-  }
-  @supports (animation-timeline: scroll()) and (animation-range: 0px 1px) {
-    .progress-page .section-art-grid {
-      animation:
-        grid-power 900ms steps(1, end) both,
-        auto linear hero-parallax both;
-      animation-timeline: auto, scroll(root block);
-      animation-range: normal, 0px 24rem;
-    }
-  }
-}
-@property --ink {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
-@property --wave {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0px;
 }
 @keyframes masthead-edge {
   from { transform: scaleX(0); opacity: 1; }
@@ -2655,111 +2369,6 @@ figcaption {
 }
 @keyframes dot-land {
   from { transform: translateY(-.55em) scale(.2); opacity: 0; }
-  60% { opacity: 1; }
-}
-@keyframes rings-open {
-  from { opacity: 0; transform: scale(.82); }
-}
-@keyframes orbit-x {
-  from { transform: translateX(calc(var(--rx) * -1)); }
-  to { transform: translateX(var(--rx)); }
-}
-@keyframes orbit-y {
-  from { transform: translateY(calc(var(--ry) * -1)); }
-  to { transform: translateY(var(--ry)); }
-}
-@keyframes planet-in {
-  from { opacity: 0; scale: 0; }
-}
-@keyframes sheet-in {
-  from { opacity: 0; transform: var(--sheet-from, translate(-4%, 6%) rotate(-2deg)); }
-}
-/* One clock for the page: line i is written during seconds 1.1i to 1.1i + 1, then the page clears. */
-@keyframes ink-page {
-  from { --ink: 0; opacity: 1; }
-  81% { opacity: 1; }
-  90%, to { --ink: 1; opacity: 0; }
-}
-@keyframes frame-draft {
-  from { clip-path: inset(0 100% 100% 0); opacity: .2; }
-  to { clip-path: inset(-30px); opacity: 1; }
-}
-/* Edges share plot's keyframe stops so each one grows exactly under the moving head. */
-@keyframes trace-top {
-  0% { opacity: 1; transform: scaleX(0); }
-  18%, 72% { opacity: 1; transform: scaleX(1); }
-  80%, to { opacity: 0; transform: scaleX(1); }
-}
-@keyframes trace-right {
-  0%, 18% { opacity: 1; transform: scaleY(0); }
-  36%, 72% { opacity: 1; transform: scaleY(1); }
-  80%, to { opacity: 0; transform: scaleY(1); }
-}
-@keyframes trace-bottom {
-  0%, 36% { opacity: 1; transform: scaleX(0); }
-  54%, 72% { opacity: 1; transform: scaleX(1); }
-  80%, to { opacity: 0; transform: scaleX(1); }
-}
-@keyframes trace-left {
-  0%, 54% { opacity: 1; transform: scaleY(0); }
-  72% { opacity: 1; transform: scaleY(1); }
-  80%, to { opacity: 0; transform: scaleY(1); }
-}
-@keyframes plot {
-  0% { transform: translate(0, 0); opacity: 0; }
-  4% { opacity: 1; transform: translate(0, 0); }
-  18% { transform: translate(100%, 0); }
-  36% { transform: translate(100%, 100%); }
-  54% { transform: translate(0, 100%); }
-  72% { transform: translate(0, 0); opacity: 1; }
-  80%, to { transform: translate(0, 0); opacity: 0; }
-}
-@keyframes scan {
-  from { transform: translateX(-100%); opacity: 0; }
-  10% { opacity: 1; }
-  55% { transform: translateX(560%); opacity: 1; }
-  62%, to { transform: translateX(560%); opacity: 0; }
-}
-@keyframes field-flicker {
-  0%, 100% { opacity: .32; }
-  8% { opacity: .55; }
-  10% { opacity: .28; }
-  13% { opacity: .62; }
-  30% { opacity: .38; }
-  52% { opacity: .5; }
-  54% { opacity: .3; }
-  56% { opacity: .58; }
-  78% { opacity: .36; }
-}
-@keyframes field-wave {
-  from { --wave: 0px; opacity: .9; }
-  70% { opacity: .5; }
-  to { --wave: 34rem; opacity: 0; }
-}
-@keyframes current-x {
-  0% { opacity: 0; transform: scaleX(var(--dir)) translateX(0); }
-  4% { opacity: 1; }
-  38% { opacity: 1; }
-  45%, to { opacity: 0; transform: scaleX(var(--dir)) translateX(264px); }
-}
-@keyframes current-y {
-  0% { opacity: 0; transform: scaleY(var(--dir)) translateY(0); }
-  4% { opacity: 1; }
-  38% { opacity: 1; }
-  45%, to { opacity: 0; transform: scaleY(var(--dir)) translateY(176px); }
-}
-@keyframes node-spark {
-  0%, 30%, to { opacity: 0; transform: scale(.4); }
-  33% { opacity: 1; transform: scale(1.3); }
-  40% { opacity: .5; transform: scale(1); }
-  46% { opacity: 0; }
-}
-@keyframes grid-power {
-  0% { opacity: .15; }
-  12% { opacity: .9; }
-  20% { opacity: .3; }
-  34% { opacity: 1; }
-  44% { opacity: .55; }
   60% { opacity: 1; }
 }
 @keyframes section-art-in {
@@ -2800,12 +2409,6 @@ figcaption {
   from { opacity: 0; transform: translateX(-90%); }
   28% { opacity: 1; }
   to { opacity: 0; transform: translateX(90%); }
-}
-@keyframes menu-in {
-  from { opacity: 0; transform: translateY(-8px); }
-}
-@keyframes menu-item-in {
-  from { opacity: .35; transform: translateX(-9px); }
 }
 @keyframes rise {
   from {

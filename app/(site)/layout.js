@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./masthead-art.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
