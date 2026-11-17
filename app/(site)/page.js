@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getEntries } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import { site } from "@/lib/site";
@@ -7,6 +6,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ArticleCard from "@/components/ArticleCard";
 import ProjectCard from "@/components/ProjectCard";
 import ProgressCard from "@/components/ProgressCard";
+import NavigationLink from "@/components/NavigationLink";
 export const revalidate = 60;
 const homeTitle = `${site.name} — A personal notebook`;
 const baseMetadata = pageMetadata(homeTitle, site.description, "/");
@@ -16,37 +16,46 @@ export default async function HomePage() {
   const [writing, projects, progress] = await Promise.all(
     ["writing", "project", "progress"].map(getEntries),
   );
-  const featured = [...writing, ...projects]
-    .filter((d) => d.featured)
+  const featuredEssay = writing.find((entry) => entry.featured) || writing[0];
+  const recentWriting = writing.filter((entry) => entry !== featuredEssay).slice(0, 2);
+  const selectedProjects = [...projects]
+    .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
     .slice(0, 2);
   return (
     <>
       <HeroSection lead={writing[0] || projects[0] || progress[0]} />
       <div className="container home-content">
-        {featured.length > 0 && (
-          <section className="section">
-            <SectionHeading title="Featured" />
-            <div className="featured-grid">
-              {featured.map((d) =>
-                d._type === "writing" ? (
-                  <ArticleCard key={d._id} entry={d} featured />
-                ) : (
-                  <ProjectCard key={d._id} entry={d} />
-                ),
-              )}
-            </div>
-          </section>
-        )}
-        <section className="section" id="writing">
+        <section className="section" aria-labelledby="projects">
           <SectionHeading
-            title="Recent writing"
+            id="projects"
+            title="Things I’m building"
+            href="/projects"
+            linkText="All projects"
+          />
+          {selectedProjects.length ? (
+            <div className="project-grid">
+              {selectedProjects.map((entry, index) => (
+                <ProjectCard key={entry._id} entry={entry} showcase={index === 0} sharedCover />
+              ))}
+            </div>
+          ) : (
+            <p className="empty-note" data-reveal="">
+              Project notes will appear here as they take shape.
+            </p>
+          )}
+        </section>
+        <section className="section" aria-labelledby="writing">
+          <SectionHeading
+            id="writing"
+            title="Writing"
             href="/writing"
             linkText="All writing"
           />
-          {writing.length ? (
-            writing
-              .slice(0, 3)
-              .map((d) => <ArticleCard key={d._id} entry={d} />)
+          {featuredEssay ? (
+            <>
+              <ArticleCard entry={featuredEssay} featured />
+              {recentWriting.map((entry) => <ArticleCard key={entry._id} entry={entry} />)}
+            </>
           ) : (
             <div className="empty-note" data-reveal="">
               <p>Room for longer thoughts.</p>
@@ -57,28 +66,9 @@ export default async function HomePage() {
             </div>
           )}
         </section>
-        <section className="section" id="projects">
+        <section className="section progress-section" aria-labelledby="study-logs">
           <SectionHeading
-            title="Things I’m building"
-            href="/projects"
-            linkText="All projects"
-          />
-          <div className="project-grid">
-            {[...projects].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
-              .slice(0, 2)
-              .map((d) => (
-                <ProjectCard key={d._id} entry={d} />
-              ))}
-          </div>
-          {!projects.length && (
-            <p className="empty-note" data-reveal="">
-              Project notes will appear here as they take shape.{" "}
-              <Link href="/projects">Explore the archive →</Link>
-            </p>
-          )}
-        </section>
-        <section className="section progress-section">
-          <SectionHeading
+            id="study-logs"
             title="Learning, in progress"
             href="/progress"
             linkText="The archive"
@@ -99,9 +89,9 @@ export default async function HomePage() {
         </section>
         <section className="section about-strip" data-reveal="">
           <h2>About the notebook</h2>
-          <Link className="text-link" href="/about">
+          <NavigationLink className="text-link" href="/about" prefetchOnIntent>
             More about me <span aria-hidden="true">→</span>
-          </Link>
+          </NavigationLink>
         </section>
       </div>
     </>

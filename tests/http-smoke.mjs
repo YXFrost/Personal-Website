@@ -55,6 +55,9 @@ try {
     assert.ok(feed.includes(new URL("/feed.xml", expected).href));
   }
   if (process.env.TEST_LEGACY_MOVES === "1") {
+    const projects = await (await fetch(base + "/projects")).text();
+    assert.ok(projects.includes("/projects/personal-website"));
+    assert.equal((await fetch(base + "/projects/personal-website")).status, 200);
     const moves = JSON.parse(await readFile(new URL("../content/legacy-routes.json", import.meta.url), "utf8"));
     for (const move of moves.filter((entry) => entry.documentId)) {
       const response = await fetch(base + move.source, { redirect: "manual" });

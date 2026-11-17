@@ -21,7 +21,9 @@ export const viewport = {
 };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    // Extensions (password managers, translators) add attributes to <html> before
+    // hydration. This only ignores attribute differences on this one element.
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content

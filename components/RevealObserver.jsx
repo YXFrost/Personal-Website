@@ -1,8 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-// Reveals [data-reveal] elements once as they scroll in. Content that is already on
-// screen, or rendered without JS, is never hidden.
+// Animate each offscreen item on entry while keeping its default state visible.
 export default function RevealObserver() {
   const pathname = usePathname();
   useEffect(() => {
@@ -13,20 +12,30 @@ export default function RevealObserver() {
       return;
     const observer = new IntersectionObserver(
       (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.dataset.reveal = "in";
-          observer.unobserve(entry.target);
+        for (const { target, isIntersecting } of entries) {
+          if (!isIntersecting) continue;
+          if (target.dataset.reveal === "pending") target.dataset.reveal = "in";
+          observer.unobserve(target);
         }
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.1 },
+      { rootMargin: "0px 0px 3% 0px" },
     );
-    for (const el of document.querySelectorAll('[data-reveal]:not([data-reveal="in"])')) {
-      if (el.getBoundingClientRect().top < innerHeight * 0.9) continue;
+    function finishOnFocus(event) {
+      const target = event.target.closest?.('[data-reveal="pending"],[data-reveal="in"]');
+      if (!target) return;
+      observer.unobserve(target);
+      target.dataset.reveal = "done";
+    }
+    for (const el of document.querySelectorAll('[data-reveal=""],[data-reveal="pending"]')) {
+      if (el.getBoundingClientRect().top < innerHeight) continue;
       el.dataset.reveal = "pending";
       observer.observe(el);
     }
-    return () => observer.disconnect();
+    document.addEventListener("focusin", finishOnFocus);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("focusin", finishOnFocus);
+    };
   }, [pathname]);
   return null;
 }

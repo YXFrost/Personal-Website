@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import Form from "next/form";
 import SearchSubmit from "./SearchSubmit";
 import { archiveUrl } from "@/lib/utils.mjs";
@@ -41,20 +41,20 @@ export default function ArchiveFilters({
       )}
       {showChips && values.length > 0 && (
         <nav className="filters" aria-label={label}>
-          <Link
+          <NavigationLink
             href={archiveUrl(basePath, { ...active, [param]: "" })}
             aria-current={!active[param] ? "page" : undefined}
           >
             {allLabel}
-          </Link>
+          </NavigationLink>
           {values.map(({ value }) => (
-            <Link
+            <NavigationLink
               key={value}
               href={archiveUrl(basePath, { ...active, [param]: value })}
               aria-current={active[param] === value ? "page" : undefined}
             >
               {value}
-            </Link>
+            </NavigationLink>
           ))}
         </nav>
       )}

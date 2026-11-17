@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { useEffect, useRef } from "react";
 import { formatDate } from "@/lib/utils.mjs";
 
@@ -25,9 +25,9 @@ export default function ArchiveCount({ count, noun, active, basePath, searchId }
         {active.month && ` · ${formatDate(active.month + "-01", true)}`}
       </span>
       {filtered && (
-        <Link href={basePath} onNavigate={() => { restoreFocus.current = true; }}>
+        <NavigationLink href={basePath} onNavigate={() => { restoreFocus.current = true; }}>
           Clear filters <span aria-hidden="true">×</span>
-        </Link>
+        </NavigationLink>
       )}
     </div>
   );

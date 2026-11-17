@@ -48,7 +48,7 @@ New entries use `body`, `summary`, `coverImage`, optional dates/tags/SEO and oth
 
 Use headings in a project body for Overview → Motivation → Process → Challenges → Result → Lessons learned. No rigid template is required.
 
-When Sanity is configured, Sanity is the content source. When no project ID is configured, the site uses `content/*.json`; this includes a website project example, with empty Writing/Progress. A configured CMS error is surfaced rather than silently presenting an empty archive. CMS reads revalidate approximately every 60 seconds.
+Sanity supplies Writing, Progress, and CMS-managed projects when configured. The notebook case study in `content/projects.json` is also available in Projects. A published Sanity project with the same slug takes precedence. With no project ID, the site uses `content/*.json`. A configured CMS error is shown as an error, and CMS reads revalidate approximately every 60 seconds.
 
 Set `SITE_URL` to your public HTTPS origin in Vercel Production, or enable the Vercel system production URL. `NEXT_PUBLIC_SITE_URL` is accepted for compatibility. Missing public origin and Vercel Preview builds disable indexing. Keep `CONTENT_PREVIEW=0` for production.
 

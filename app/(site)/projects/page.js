@@ -1,6 +1,7 @@
 import { getEntries } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import ProjectCard from "@/components/ProjectCard";
+import SectionPage from "@/components/SectionPage";
 import ArchiveFilters, { ArchiveCount, readFilters } from "@/components/ArchiveFilters";
 import { facetCounts, filterEntries } from "@/lib/utils.mjs";
 import Link from "next/link";
@@ -16,14 +17,13 @@ export default async function ProjectsPage({ searchParams }) {
   const statuses = facetCounts(entries.map((d) => d.status));
   const filtered = filterEntries(entries, { ...active, categoryField: "status" });
   const showSearch = entries.length > 6 || Boolean(active.q && entries.length);
+  const browsing = !active.q && !active.category && !active.tag;
   return (
-    <div className="container archive">
-      <header className="page-heading">
-        <h1>
-          Projects<span>.</span>
-        </h1>
-        <p>Things I build, with notes on the decisions, setbacks, and results.</p>
-      </header>
+    <SectionPage
+      section="projects"
+      title="Projects"
+      description="Things I build, with notes on the decisions, setbacks, and results."
+    >
       <ArchiveFilters
         basePath="/projects"
         label="Project status"
@@ -48,7 +48,15 @@ export default async function ProjectsPage({ searchParams }) {
       />
       <div id="projects-results" className="archive-results project-grid">
         {filtered.map((d, index) => (
-          <ProjectCard headingLevel="h2" key={d._id} entry={d} filters={active} leading={index === 0} />
+          <ProjectCard
+            headingLevel="h2"
+            key={d._id}
+            entry={d}
+            filters={active}
+            leading={index === 0}
+            showcase={browsing && index === 0 && Boolean(d.coverImage)}
+            sharedCover
+          />
         ))}
       </div>
       {entries.length > 0 && !filtered.length && (
@@ -66,6 +74,6 @@ export default async function ProjectsPage({ searchParams }) {
           <Link className="text-link" href="/writing">Browse writing <span aria-hidden="true">→</span></Link>
         </div>
       )}
-    </div>
+    </SectionPage>
   );
 }

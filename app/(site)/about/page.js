@@ -1,36 +1,37 @@
-import Link from "next/link";
 import { site } from "@/lib/site";
 import { safeUrl } from "@/lib/utils.mjs";
 import { pageMetadata } from "@/lib/metadata";
+import NavigationLink from "@/components/NavigationLink";
+import SectionPage from "@/components/SectionPage";
+
+const notebookLinks = [
+  { href: "/writing", title: "Writing", description: "Essays that bring ideas together." },
+  { href: "/projects", title: "Projects", description: "What I build and what I learn along the way." },
+  { href: "/progress", title: "Progress", description: "Monthly study logs and reflections." },
+];
+
 export const metadata = pageMetadata("About", site.description, "/about");
 export default function AboutPage() {
   return (
-    <div className="container archive about-page">
-      <header className="page-heading">
-        <p className="eyebrow">Behind the notebook</p>
-        <h1>
-          Always a student<span>.</span>
-        </h1>
-        <p>
+    <SectionPage
+      section="about"
+      eyebrow="Behind the notebook"
+      title="Always a student"
+      description={(
+        <>
           Interested in how things work.
           <br />
           And in the questions that don’t have easy answers.
-        </p>
-      </header>
+        </>
+      )}
+    >
       <div className="about-columns">
         <div className="prose">
           {site.about.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
-          <h2>What you’ll find here</h2>
-          <p>
-            <Link href="/writing">Writing</Link> is where I synthesize ideas.{" "}
-            <Link href="/projects">Projects</Link> is where I document things I
-            build. <Link href="/progress">Progress</Link> keeps the record of
-            learning along the way.
-          </p>
         </div>
-        <aside className="about-note">
+        <aside className="about-note" data-reveal="">
           <p className="eyebrow">A working principle</p>
           <blockquote>
             Understand it.
@@ -50,6 +51,20 @@ export default function AboutPage() {
           )}
         </aside>
       </div>
-    </div>
+      <section className="about-routes" aria-labelledby="notebook-contents">
+        <h2 id="notebook-contents">What you’ll find here</h2>
+        <ul>
+          {notebookLinks.map(({ href, title, description }) => (
+            <li key={href} data-reveal="">
+              <NavigationLink className="about-route-link" href={href} prefetchOnIntent>
+                <h3>{title}</h3>
+                <p>{description}</p>
+                <span className="route-arrow" aria-hidden="true">→</span>
+              </NavigationLink>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </SectionPage>
   );
 }

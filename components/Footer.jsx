@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { site } from "@/lib/site";
 import { safeUrl } from "@/lib/utils.mjs";
 export default function Footer() {
@@ -6,9 +6,9 @@ export default function Footer() {
     <footer className="site-footer">
       <div className="container footer-inner">
         <div>
-          <Link href="/" className="wordmark" aria-label="YN — homepage">
+          <NavigationLink href="/" className="wordmark" aria-label="YN — homepage">
             YN<span>.</span>
-          </Link>
+          </NavigationLink>
           <p>A notebook, always in progress.</p>
         </div>
         <div className="footer-right">
@@ -25,7 +25,7 @@ export default function Footer() {
                 </li>
               )}
               <li>
-                <Link href="/about">About</Link>
+                <NavigationLink href="/about">About</NavigationLink>
               </li>
               <li>
                 <a href="/feed.xml">RSS ↗</a>

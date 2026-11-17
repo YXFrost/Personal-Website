@@ -109,7 +109,8 @@ export default async function ArticleRenderer({ body = [] }) {
   };
   return (
     <>
-      {hasMath && <link rel="stylesheet" href="/math/katex.min.css" />}
+      {/* precedence lets React hoist this into <head> once instead of preloading a body link. */}
+      {hasMath && <link rel="stylesheet" href="/math/katex.min.css" precedence="default" />}
       <div className="prose">
         <PortableText value={body} components={components} />
       </div>

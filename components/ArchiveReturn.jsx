@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { useSearchParams } from "next/navigation";
 import { archiveUrl } from "@/lib/utils.mjs";
 
@@ -12,8 +12,8 @@ export default function ArchiveReturn({ archive }) {
   const href = archiveUrl(archive, filters);
   if (href === archive) return null;
   return (
-    <Link className="back-link" href={href} prefetch={false}>
+    <NavigationLink className="back-link" href={href} prefetchOnIntent>
       <span aria-hidden="true">←</span> Back to results
-    </Link>
+    </NavigationLink>
   );
 }

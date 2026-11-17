@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { archiveEntryPath, formatDate } from "@/lib/utils.mjs";
 import TagList from "./TagList";
 export default function ProgressCard({ entry, filters }) {
@@ -15,9 +15,9 @@ export default function ProgressCard({ entry, filters }) {
       </div>
       <div>
         <h3>
-          <Link className="card-title" href={archiveEntryPath(entry, filters)} prefetch={false}>
+          <NavigationLink className="card-title" href={archiveEntryPath(entry, filters)} prefetchOnIntent>
             {entry.title} <span aria-hidden="true">→</span>
-          </Link>
+          </NavigationLink>
         </h3>
         <p>{entry.summary}</p>
         <TagList tags={entry.subjects || []} basePath="/progress" label="Subjects" />

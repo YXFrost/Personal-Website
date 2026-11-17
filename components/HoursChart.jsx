@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { entryPath } from "@/lib/utils.mjs";
 export default function HoursChart({ months }) {
   if (!months.length) return null;
@@ -24,13 +24,13 @@ export default function HoursChart({ months }) {
       <ul className="hours-list" aria-label="Monthly study hours">
         {months.filter((month) => month.entries.length).map((month) => (
           <li key={month.key}>
-            <Link
+            <NavigationLink
               href={month.entries.length === 1 ? entryPath(month.entries[0]) : `/progress?month=${month.key}#progress-results`}
               prefetch={false}
             >
               <span>{month.label}</span>
               <span>{month.hours.toLocaleString("en-GB")} {month.hours === 1 ? "hour" : "hours"} <span aria-hidden="true">→</span></span>
-            </Link>
+            </NavigationLink>
           </li>
         ))}
       </ul>

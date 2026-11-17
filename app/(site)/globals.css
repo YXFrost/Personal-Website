@@ -62,6 +62,9 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-height) + 1.5rem);
 }
+html:has(:focus-visible) {
+  scroll-behavior: auto;
+}
 body {
   margin: 0;
   background: var(--bg);
@@ -224,6 +227,20 @@ figcaption {
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
+.site-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--amber);
+  transform: scaleX(.22);
+  transform-origin: left;
+  opacity: 0;
+  pointer-events: none;
+}
+html:has([data-link-pending]) .site-header::after {
+  opacity: 1;
+}
 .nav {
   display: flex;
   align-items: center;
@@ -261,6 +278,7 @@ figcaption {
   position: relative;
 }
 .nav-links a:hover,
+.nav-links a:active,
 .nav-links a[aria-current] {
   color: var(--amber);
 }
@@ -307,13 +325,36 @@ figcaption {
   content: "−";
 }
 .hero {
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 48px 48px;
   border-bottom: 1px solid var(--border);
   position: relative;
   overflow: hidden;
+}
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 78% 44%, #252013, transparent 62%);
+}
+.hero-grid-paper {
+  position: absolute;
+  inset: 0 0 -3rem;
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.hero-contours {
+  position: absolute;
+  inset: -35% -15% -35% 24%;
+  rotate: -19deg;
+  background: repeating-radial-gradient(
+    ellipse at 61% 52%,
+    transparent 0 32px,
+    rgb(238 185 94 / .23) 33px 34px,
+    transparent 35px 38px
+  );
+  mask-image: radial-gradient(ellipse at 61% 52%, #000 7%, transparent 64%);
 }
 /* Pointer glow: a warm wash plus amber grid lines, both centred on the pointer. */
 .hero-glow {
@@ -330,19 +371,17 @@ figcaption {
     pointer-events: none;
     opacity: 0;
     transition: opacity var(--dur-2) var(--ease-out);
-    background: radial-gradient(
-      circle 320px at var(--mx, 50%) var(--my, 50%),
-      rgb(238 185 94 / 0.09),
-      transparent 70%
-    );
+    background:
+      radial-gradient(circle 120px at var(--mx, 50%) var(--my, 50%), rgb(238 185 94 / .14), transparent 80%),
+      radial-gradient(ellipse 400px 290px at var(--mx, 50%) var(--my, 50%), rgb(238 185 94 / .075), transparent 78%);
   }
   .hero-glow::after {
     content: "";
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgb(238 185 94 / 0.45) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(238 185 94 / 0.45) 1px, transparent 1px);
+      linear-gradient(rgb(238 185 94 / .55) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(238 185 94 / .55) 1px, transparent 1px);
     background-size: 48px 48px;
     -webkit-mask-image: radial-gradient(
       circle 200px at var(--mx, 50%) var(--my, 50%),
@@ -363,26 +402,29 @@ figcaption {
   display: grid;
   grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
   gap: clamp(2rem, 6vw, 6rem);
-  padding-block: clamp(3rem, 6vw, 5.75rem);
+  padding-block: clamp(3.5rem, 7vw, 7rem);
   align-items: center;
 }
 .hero h1 {
   max-width: 13ch;
-  font-size: clamp(2.65rem, 6vw, 5.35rem);
+  font-size: clamp(2.85rem, 7.4vw, 7rem);
   font-weight: 650;
-  letter-spacing: -0.047em;
-  line-height: 1.06;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
   margin: 0;
 }
-.hero h1 span {
+.hero-line,
+.hero-line > span {
   display: block;
+}
+.hero-line-accent {
   color: var(--amber);
 }
 .hero-description {
   max-width: 29rem;
   color: var(--secondary);
-  margin-top: 1rem;
-  font-size: 1rem;
+  margin-top: 1.4rem;
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
   line-height: 1.65;
 }
 .hero-entry {
@@ -438,7 +480,7 @@ figcaption {
 .currently {
   border: 1px solid var(--border);
   padding: clamp(1.5rem, 3vw, 2.5rem);
-  background: var(--bg);
+  background: var(--surface);
 }
 .section-kicker {
   display: flex;
@@ -479,6 +521,42 @@ figcaption {
   margin-top: 1.7rem;
   border-top: 1px solid var(--border);
 }
+.home-index ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+}
+.home-index li + li {
+  border-inline-start: 1px solid var(--border);
+  margin-top: 0;
+}
+.home-index a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .35rem;
+  min-height: 3.5rem;
+  padding: .65rem clamp(.55rem, 2vw, 1.5rem);
+  font-size: .875rem;
+  font-weight: 550;
+  line-height: 1.3;
+}
+.home-index a:is(:hover, :focus-visible) {
+  background: var(--surface-raised);
+}
+.home-index a:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline-offset: -3px;
+}
+.home-index a span {
+  color: var(--amber);
+}
 .section {
   padding-block: var(--space-6);
   border-bottom: 1px solid var(--border);
@@ -497,17 +575,10 @@ figcaption {
   font-size: clamp(1.6rem, 3vw, 2.1rem);
   letter-spacing: -0.03em;
 }
-.featured-grid,
 .project-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 2rem;
-}
-.featured-grid > :only-child {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  grid-column: 1/-1;
-  align-items: stretch;
 }
 .project-card,
 .featured-article {
@@ -541,6 +612,37 @@ figcaption {
 .project-card-content {
   padding: 1.65rem;
   align-self: center;
+}
+.project-showcase {
+  grid-column: 1 / -1;
+}
+.project-showcase .project-preview {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  padding-inline: clamp(1.35rem, 4vw, 3rem);
+  background: radial-gradient(ellipse at 40% 22%, #403422, #211d17 86%);
+  border-block-end: 1px solid var(--border);
+}
+.project-showcase .image-placeholder {
+  width: 100%;
+}
+.project-artwork {
+  min-width: 0;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--bg);
+  box-shadow: 0 .65rem 2rem rgb(0 0 0 / .35);
+}
+.project-artwork img {
+  height: 100%;
+}
+.project-showcase .project-card-content {
+  padding: clamp(1.4rem, 4vw, 3.25rem);
+}
+.project-showcase .project-card-content :is(h2, h3) {
+  font-size: clamp(1.65rem, 3.5vw, 2.75rem);
+  letter-spacing: -.04em;
 }
 .project-card h2,
 .project-card h3,
@@ -696,6 +798,34 @@ article:has(> .card-title:focus-visible) {
 .featured-article .article-card-content {
   padding: 1.65rem;
 }
+:is(.home-content, .writing-page) .featured-article .article-card-content {
+  padding: clamp(1.2rem, 2.5vw, 2rem);
+}
+:is(.home-content, .writing-page) .featured-article :is(h2, h3) {
+  font-size: clamp(1.45rem, 3vw, 2.15rem);
+  max-width: 29ch;
+}
+@media (width > 48rem) {
+  .hero-grid {
+    min-height: min(67svh, 40rem);
+  }
+  .project-showcase,
+  .featured-article:has(.article-preview) {
+    display: grid;
+    align-items: center;
+  }
+  .featured-article:has(.article-preview) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  }
+  .project-showcase {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  }
+  .project-showcase .project-preview {
+    align-self: stretch;
+    border-block-end: 0;
+    border-inline-end: 1px solid var(--border);
+  }
+}
 .empty-note {
   padding: 1.6rem 0;
   border-top: 1px solid var(--border);
@@ -802,22 +932,332 @@ article:has(> .card-title:focus-visible) {
   padding-bottom: 6rem;
 }
 .page-heading {
-  padding-block: 4.5rem 3.5rem;
+  padding-block: clamp(3.25rem, 7vw, 6.4rem);
   max-width: 55rem;
 }
 .page-heading h1 {
-  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-size: clamp(3rem, 7.4vw, 6.4rem);
   font-weight: 650;
-  letter-spacing: -0.04em;
+  letter-spacing: -.056em;
+  line-height: 1.02;
   margin: 0 0 .85rem;
 }
-.page-heading h1 span {
+.page-heading .title-line {
+  display: block;
+}
+.page-heading .title-end {
+  white-space: nowrap;
+}
+.page-heading .title-dot {
+  display: inline-block;
   color: var(--amber);
 }
 .page-heading > p {
   font-size: clamp(1rem, 2vw, 1.15rem);
   color: var(--secondary);
   line-height: 1.8;
+}
+.writing-page {
+  --section-wash: #261e15;
+  --section-ink: 225 184 127;
+}
+.projects-page {
+  --section-wash: #24281c;
+  --section-ink: 197 200 132;
+}
+.progress-page {
+  --section-wash: #1b2825;
+  --section-ink: 131 194 172;
+}
+.about-page {
+  --section-wash: #2b2118;
+  --section-ink: 237 176 116;
+}
+.section-page {
+  background: linear-gradient(180deg, var(--section-wash), var(--bg) 54rem);
+}
+.section-masthead {
+  position: relative;
+  isolation: isolate;
+  border-bottom: 1px solid rgb(var(--section-ink) / .25);
+  background:
+    radial-gradient(ellipse at 83% 60%, var(--section-wash), transparent 65%),
+    var(--bg);
+}
+.section-masthead .section-description {
+  max-width: 41ch;
+}
+.section-masthead .eyebrow {
+  font: 500 .75rem/1.5 var(--mono);
+  letter-spacing: .075em;
+  color: var(--amber);
+  margin-bottom: 1.2rem;
+}
+.section-masthead .text-link {
+  margin-top: 1rem;
+}
+.section-content {
+  padding-top: clamp(2rem, 4vw, 3.75rem);
+}
+.section-art {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  z-index: -1;
+  pointer-events: none;
+}
+.section-art-grid,
+.section-art-detail {
+  position: absolute;
+}
+.section-art-grid {
+  --drift: 1.25rem;
+  inset: 0 0 -2rem;
+  background:
+    linear-gradient(rgb(var(--section-ink) / .10) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--section-ink) / .10) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(90deg, transparent 8%, #000 92%);
+}
+.section-art-detail {
+  --drift: 4.5rem;
+  inset: -22% 0 -30% 47%;
+}
+.writing-page .section-art-detail {
+  rotate: -13deg;
+}
+.writing-page .section-art-detail::before,
+.writing-page .section-art-detail::after {
+  content: "";
+  position: absolute;
+  width: 54%;
+  height: 77%;
+  border: 1px solid rgb(var(--section-ink) / .31);
+  inset: 7% auto auto 30%;
+}
+.writing-page .section-art-detail::after {
+  inset: 14% auto auto 22%;
+  background:
+    linear-gradient(90deg, transparent 12%, rgb(var(--section-ink) / .22) 12% calc(12% + 1px), transparent calc(12% + 1px)),
+    repeating-linear-gradient(transparent 0 27px, rgb(var(--section-ink) / .21) 28px 29px),
+    #241d15;
+}
+.projects-page .section-art-detail {
+  rotate: -18deg;
+  inset-inline: 54% -4%;
+}
+.projects-page .section-art-detail::before,
+.projects-page .section-art-detail::after {
+  content: "";
+  position: absolute;
+  inset: 9% 13% 11% 8%;
+  border: 1px solid rgb(var(--section-ink) / .35);
+  box-shadow: 0 0 0 24px rgb(var(--section-ink) / .03);
+}
+.projects-page .section-art-detail::after {
+  inset: 18% 4% 3% 19%;
+  border-style: dashed;
+}
+.progress-page .section-art-detail {
+  inset-inline: 43% -8%;
+  background:
+    radial-gradient(circle, rgb(var(--section-ink) / .52) 1px, transparent 2px) 0 0 / 20px 20px,
+    repeating-radial-gradient(ellipse at 66% 66%, transparent 0 43px, rgb(var(--section-ink) / .26) 44px 45px);
+  mask-image: radial-gradient(ellipse at 68% 58%, #000 6%, transparent 65%);
+}
+.about-page .section-art-detail {
+  rotate: -16deg;
+  inset-inline: 40% -15%;
+}
+/* The ellipse ratio is measured by SectionArt so it matches the original farthest-side rings. */
+.about-rings {
+  --ring-ratio: .5;
+  position: absolute;
+  inset: 0;
+  background: repeating-radial-gradient(
+    ellipse 100px calc(100px * var(--ring-ratio)) at 63% 54%,
+    transparent 0 32px,
+    rgb(var(--section-ink) / .30) 33px 34px,
+    transparent 35px 38px
+  );
+  mask-image: radial-gradient(ellipse at 65% 55%, #000 10%, transparent 68%);
+}
+/* Planets: x and y run as two eased sine waves a quarter-period apart, tracing the ellipse. */
+.orbit {
+  --ry: calc(var(--rx) * var(--ring-ratio));
+  position: absolute;
+  left: 63%;
+  top: 54%;
+  transform: translateX(calc(var(--rx) * var(--cos)));
+}
+.orbit-y {
+  display: block;
+  transform: translateY(calc(var(--ry) * var(--sin)));
+}
+.planet {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff1d6, rgb(var(--section-ink)) 55%, #8a5a2c);
+  box-shadow: 0 0 calc(var(--size) * 1.6) rgb(var(--section-ink) / .55);
+}
+.planet.has-moon::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  left: 50%;
+  top: 50%;
+  margin: -1.5px;
+  border-radius: 50%;
+  background: #f6dcb6;
+  transform: rotate(40deg) translateX(13px);
+}
+
+/* Writing: lines of "words" written onto the front sheet. */
+.writing-ink {
+  position: absolute;
+  z-index: 1;
+  left: 22%;
+  top: 14%;
+  width: 54%;
+  height: 77%;
+  overflow: hidden;
+}
+.ink-page {
+  position: absolute;
+  inset: 0;
+}
+.ink-page > span {
+  --written: clamp(0, var(--ink) * 16 - var(--i) * 1.1, 1);
+  clip-path: inset(0 calc(100% - 100% * var(--written)) 0 0);
+  position: absolute;
+  left: 15%;
+  top: calc(29px * var(--row) - 9px);
+  width: calc(var(--width) * .8);
+  height: 2px;
+  border-radius: 2px;
+  opacity: .5;
+  background: repeating-linear-gradient(
+    90deg,
+    rgb(var(--section-ink)) 0 var(--word),
+    transparent var(--word) calc(var(--word) + 7px)
+  );
+}
+
+/* Projects: a drafting head traces the solid frame while a scan passes across the sheet. */
+.draft {
+  position: absolute;
+  inset: 9% 13% 11% 8%;
+}
+.draft-edge {
+  position: absolute;
+  opacity: 0;
+  background: rgb(var(--section-ink) / .9);
+  box-shadow: 0 0 6px rgb(var(--section-ink) / .6);
+}
+.draft-top { top: -1px; left: 0; width: 100%; height: 1px; transform-origin: left; }
+.draft-right { top: 0; right: -1px; width: 1px; height: 100%; transform-origin: top; }
+.draft-bottom { bottom: -1px; left: 0; width: 100%; height: 1px; transform-origin: right; }
+.draft-left { top: 0; left: -1px; width: 1px; height: 100%; transform-origin: bottom; }
+.draft-head {
+  position: absolute;
+  inset: 0;
+}
+.draft-head::before,
+.draft-head::after {
+  content: "";
+  position: absolute;
+  left: -9px;
+  top: -9px;
+  width: 18px;
+  height: 18px;
+}
+.draft-head::before {
+  border-radius: 50%;
+  border: 1px solid rgb(var(--section-ink) / .85);
+  box-shadow: 0 0 10px rgb(var(--section-ink) / .45);
+}
+.draft-head::after {
+  background:
+    linear-gradient(rgb(var(--section-ink)) 0 0) center / 1px 100% no-repeat,
+    linear-gradient(rgb(var(--section-ink)) 0 0) center / 100% 1px no-repeat;
+  transform: scale(1.7);
+}
+.draft-scan {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 18%;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgb(var(--section-ink) / .09) 70%, rgb(var(--section-ink) / .32) 98%, transparent);
+}
+
+/* Progress: current runs along the grid lines out from a charge near the dot field. */
+.progress-page .section-art-grid {
+  --cx: round(nearest, 86%, 44px);
+  --cy: round(nearest, 66%, 44px);
+}
+.field-glow,
+.field-wave {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    linear-gradient(rgb(var(--section-ink) / .7) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--section-ink) / .7) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+.field-glow {
+  opacity: .32;
+  mask-image: radial-gradient(circle 15rem at var(--cx) var(--cy), #000, transparent 72%);
+}
+.field-current,
+.field-node {
+  position: absolute;
+  opacity: 0;
+}
+.field-current-x {
+  left: var(--cx);
+  top: calc(var(--cy) + 44px * var(--offset));
+  width: 72px;
+  height: 1px;
+  transform-origin: left;
+  background: linear-gradient(90deg, transparent, rgb(var(--section-ink) / .9) 75%, #e8fff5);
+  box-shadow: 0 0 6px rgb(var(--section-ink) / .8);
+}
+.field-current-y {
+  left: calc(var(--cx) + 44px * var(--offset));
+  top: var(--cy);
+  width: 1px;
+  height: 72px;
+  transform-origin: top;
+  background: linear-gradient(180deg, transparent, rgb(var(--section-ink) / .9) 75%, #e8fff5);
+  box-shadow: 0 0 6px rgb(var(--section-ink) / .8);
+}
+.field-node {
+  left: calc(var(--cx) + 44px * var(--col) - 4px);
+  top: calc(var(--cy) + 44px * var(--row) - 4px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #e8fff5, rgb(var(--section-ink) / .8) 35%, transparent 70%);
+}
+.writing-page .archive-results {
+  display: grid;
+  gap: 1rem;
+}
+.writing-page .archive-results .article-card {
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.writing-page .archive-results .article-card:is(:hover, :focus-within) {
+  border-color: var(--muted);
+}
+.writing-page .article-card:not(.featured-article) .article-card-content {
+  padding: clamp(1.25rem, 3vw, 2rem);
 }
 .archive-count {
   display: flex;
@@ -906,11 +1346,15 @@ article:has(> .card-title:focus-visible) {
 }
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-block: 1px solid var(--border);
-  padding-block: 2rem;
-  margin-bottom: 3rem;
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: 1px;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+.stats > div {
+  padding: clamp(1.1rem, 3vw, 2rem);
+  background: var(--surface);
 }
 .stats dt {
   font: 0.8125rem/1.5 var(--sans);
@@ -918,13 +1362,19 @@ article:has(> .card-title:focus-visible) {
 }
 .stats dd {
   margin: 0.7rem 0 0;
-  font-size: 2.5rem;
+  color: var(--amber);
+  font-size: clamp(2.1rem, 4vw, 3.5rem);
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 .progress-year {
   margin-block: 3rem;
   border-left: 1px solid var(--border);
   padding-left: 2rem;
+}
+.progress-year > .progress-card {
+  padding-inline: clamp(.85rem, 2vw, 1.5rem);
+  background: linear-gradient(90deg, rgb(var(--section-ink) / .05), transparent);
 }
 /* Timeline rail: one outlined dot per log, level with its date stamp. */
 .progress-year .progress-card::before {
@@ -938,9 +1388,6 @@ article:has(> .card-title:focus-visible) {
   border-radius: 50%;
   background: var(--bg);
 }
-.subject-totals {
-  margin-bottom: 3rem;
-}
 .subject-totals h3,
 .hours-chart-figure figcaption {
   font: 600 .875rem var(--sans);
@@ -948,9 +1395,6 @@ article:has(> .card-title:focus-visible) {
   margin: 0 0 1rem;
 }
 .subject-totals ul {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: 0 2rem;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -974,9 +1418,6 @@ article:has(> .card-title:focus-visible) {
 }
 .subject-totals a:hover {
   color: var(--amber);
-}
-.hours-chart-figure {
-  margin: 0 0 3rem;
 }
 .hours-chart {
   display: grid;
@@ -1021,6 +1462,30 @@ article:has(> .card-title:focus-visible) {
   font-weight: 600;
   margin-bottom: 1rem;
 }
+.masthead-jump {
+  color: var(--amber);
+}
+.progress-breakdown {
+  display: grid;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+.progress-breakdown > * {
+  min-width: 0;
+  margin: 0;
+  padding: clamp(1rem, 2.5vw, 1.8rem);
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.progress-breakdown .hours-bar {
+  background: repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), var(--border) calc(25% - 1px) 25%);
+}
+@media (min-width: 60rem) {
+  .progress-breakdown:has(> :nth-child(2)) {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
 #progress-results {
   scroll-margin-top: calc(var(--header-height) + 1rem);
 }
@@ -1055,16 +1520,65 @@ article:has(> .card-title:focus-visible) {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
   gap: 5rem;
+  align-items: start;
 }
 .about-note {
-  border-left: 1px solid var(--border);
-  padding-left: 2.5rem;
+  border: 1px solid var(--border);
+  border-top-color: rgb(var(--section-ink) / .45);
+  padding: clamp(1.5rem, 3vw, 2.75rem);
+  background: linear-gradient(150deg, var(--section-wash), var(--surface));
 }
 .about-note blockquote {
   font: clamp(1.6rem, 3vw, 2.2rem)/1.6 var(--serif);
   margin-top: 1.5rem;
 }
 .about-note em {
+  color: var(--amber);
+}
+.about-routes {
+  margin-top: clamp(2.5rem, 6vw, 5rem);
+}
+.about-routes > h2 {
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  margin-bottom: 1.25rem;
+}
+.about-routes ul {
+  display: grid;
+  gap: .875rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.about-routes li {
+  margin: 0;
+}
+.about-route-link {
+  display: grid;
+  position: relative;
+  align-content: start;
+  gap: .5rem;
+  height: 100%;
+  padding: 1.4rem 3rem 1.4rem 1.4rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.about-route-link:is(:hover, :focus-visible) {
+  background: var(--surface-raised);
+  border-color: var(--muted);
+}
+.about-route-link h3 {
+  font-size: 1.12rem;
+}
+.about-route-link p {
+  font-size: .925rem;
+  line-height: 1.55;
+  color: var(--secondary);
+}
+.route-arrow {
+  position: absolute;
+  right: 1.4rem;
+  top: 1.25rem;
   color: var(--amber);
 }
 .contact-links {
@@ -1510,19 +2024,17 @@ figcaption {
     margin: 0;
     padding: 0;
   }
-  .featured-grid,
   .project-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
   }
-  .featured-grid > :only-child {
-    display: block;
-  }
-  .project-preview,
-  .article-preview {
+  .project-preview {
     aspect-ratio: 16/10;
   }
-  .archive .project-preview {
+  .featured-article .article-preview {
+    aspect-ratio: 16 / 9;
+  }
+  .archive .project-card:not(.project-showcase) .project-preview {
     max-height: 17rem;
   }
   .progress-card {
@@ -1533,11 +2045,21 @@ figcaption {
     grid-template-columns: minmax(0, 1fr);
     gap: 3rem;
   }
-  .about-note {
-    padding-left: 1.5rem;
+  .section-art {
+    opacity: .68;
   }
-  .page-heading {
-    padding-block: 3rem 2.5rem;
+  .section-art-detail {
+    transform: translateX(12%);
+  }
+  .writing-page .section-art-detail {
+    inset-inline: 36% -27%;
+  }
+  .projects-page .section-art-detail {
+    inset-inline: 53% -20%;
+  }
+  .progress-page .section-art-detail,
+  .about-page .section-art-detail {
+    inset-inline: 29% -37%;
   }
   .entry-header h1 {
     font-size: clamp(2.3rem, 7vw, 3.5rem);
@@ -1617,6 +2139,10 @@ figcaption {
   .actions {
     gap: 0.6rem 1rem;
   }
+  .hero-contours {
+    inset-inline: -8% -56%;
+    opacity: .65;
+  }
   .progress-card {
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
@@ -1640,10 +2166,6 @@ figcaption {
   }
   .stats {
     grid-template-columns: minmax(0, 1fr);
-    gap: 1.5rem;
-  }
-  .stats dd {
-    font-size: 2rem;
   }
   .stats > div {
     display: flex;
@@ -1730,14 +2252,10 @@ figcaption {
   }
   .project-preview img,
   .article-preview img {
-    transition: transform var(--dur-3) var(--ease-out);
-  }
-  .hours-chart-figure[data-reveal="pending"] .hours-fill {
-    transform: scaleY(0);
+    transition: transform 560ms var(--ease-out);
   }
   .hours-chart-figure[data-reveal="in"] .hours-fill {
-    transition: transform var(--dur-3) var(--ease-out);
-    transition-delay: calc(var(--i, 0) * 30ms);
+    animation: chart-bar-in 620ms var(--ease-out) calc(var(--i, 0) * 35ms) both;
   }
   .toc a {
     transition:
@@ -1751,7 +2269,7 @@ figcaption {
   .project-card:focus-within .project-preview img,
   .featured-article:hover .article-preview img,
   .featured-article:focus-within .article-preview img {
-    transform: scale(1.02);
+    transform: scale(1.045);
   }
   .project-card,
   .featured-article {
@@ -1780,7 +2298,7 @@ figcaption {
     inset: 0;
     border-radius: 50%;
     background: var(--amber);
-    animation: pulse 2.4s var(--ease-out) infinite;
+    animation: pulse 1.9s var(--ease-out) 300ms 2;
   }
   .image-dialog,
   .image-dialog::backdrop {
@@ -1791,7 +2309,7 @@ figcaption {
       display var(--dur-2) allow-discrete;
   }
   .image-dialog {
-    transform: scale(0.98);
+    transform: translateY(8px) scale(.97);
     transition:
       opacity var(--dur-2) var(--ease-out),
       transform var(--dur-2) var(--ease-out),
@@ -1811,7 +2329,7 @@ figcaption {
       opacity: 0;
     }
     .image-dialog[open] {
-      transform: scale(0.98);
+      transform: translateY(8px) scale(.97);
     }
   }
   @media (min-width: 48rem) and (hover: hover) {
@@ -1825,58 +2343,473 @@ figcaption {
     }
   }
 }
-/* Entrance on load. The hero h1 (LCP) moves but is never transparent. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-description,
-  .hero .actions,
-  .currently {
-    animation: rise var(--dur-3) var(--ease-out) both;
+  .hero-line {
+    clip-path: inset(-.08em -.10em -.15em);
+  }
+  html:has([data-link-pending]) .site-header::after {
+    animation: navigation-progress 1250ms var(--ease-out) both;
+  }
+  .hero-line > span {
+    animation: hero-line-in 700ms var(--ease-out) both;
+  }
+  .hero-line-accent > span {
+    animation-delay: 110ms;
   }
   .hero-description {
-    animation-delay: 140ms;
+    animation: rise 500ms var(--ease-out) 165ms both;
   }
   .hero .actions {
-    animation-delay: 200ms;
+    animation: rise 560ms var(--ease-out) 225ms both;
+  }
+  .hero .actions:focus-within {
+    animation: none;
   }
   .currently {
-    animation-delay: 260ms;
+    position: relative;
+    animation: panel-in 700ms var(--ease-out) 150ms both;
   }
-  .hero h1 {
-    animation: rise-solid var(--dur-3) var(--ease-out) both;
+  .currently::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgb(238 185 94 / .72), transparent);
+    animation: panel-edge-in 640ms var(--ease-out) 340ms both;
   }
-  .page-heading > :not(h1),
+  .home-index a span {
+    transition: translate var(--dur-1) var(--ease-out);
+  }
+  .home-index a:is(:hover, :focus-visible) span {
+    translate: 0 .2rem;
+  }
+  .section-art {
+    animation: section-art-in 640ms var(--ease-out) both;
+  }
+  .route-arrow {
+    transition: translate var(--dur-1) var(--ease-out);
+  }
+  .about-route-link:is(:hover, :focus-visible) .route-arrow {
+    translate: .25rem 0;
+  }
   .entry-header > :not(h1) {
     animation: rise-light var(--dur-3) var(--ease-out) 60ms both;
   }
-  .page-heading > h1,
   .entry-header > h1 {
     animation: rise-solid-light var(--dur-3) var(--ease-out) both;
   }
-  [data-reveal="pending"] {
-    opacity: 0;
-    transform: translateY(14px);
+  .project-grid > :nth-child(even) {
+    --i: 1;
   }
-  [data-reveal="in"] {
-    transition:
-      opacity var(--dur-3) var(--ease-out),
-      transform var(--dur-3) var(--ease-out);
-    transition-delay: calc(var(--i, 0) * 60ms);
+  [data-reveal="in"]:not(:focus-within) {
+    animation: reveal-in 620ms var(--ease-out) calc(var(--i, 0) * 80ms) both;
+  }
+  .project-showcase[data-reveal="in"]:not(:focus-within) .project-artwork img {
+    animation: project-image-in 700ms var(--ease-out) both;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .project-preview,
+    .article-preview,
+    .hero .button {
+      position: relative;
+      overflow: hidden;
+    }
+    .project-preview::after,
+    .article-preview::after,
+    .hero .button::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background: linear-gradient(115deg, transparent 32%, rgb(255 223 174 / .2) 49%, transparent 66%);
+    }
+    .project-card:hover .project-preview::after,
+    .featured-article:hover .article-preview::after,
+    .hero .button:hover::before {
+      animation: light-pass 700ms var(--ease-out) both;
+    }
+  }
+  @media (max-width: 40rem) {
+    .mobile-nav[data-motion][open] .nav-links {
+      animation: menu-in 300ms var(--ease-out) both;
+    }
+    .mobile-nav[data-motion][open] .nav-links li {
+      animation: menu-item-in 340ms var(--ease-out) both;
+    }
+    .mobile-nav[data-motion][open] .nav-links li:nth-child(2) { animation-delay: 34ms; }
+    .mobile-nav[data-motion][open] .nav-links li:nth-child(3) { animation-delay: 68ms; }
+    .mobile-nav[data-motion][open] .nav-links li:nth-child(4) { animation-delay: 102ms; }
+    .mobile-nav[data-motion][open] .nav-links:focus-within li {
+      animation: none;
+    }
   }
   ::view-transition-old(.page-out) {
-    animation: fade-out 160ms var(--ease-out) both;
+    animation: page-exit 130ms var(--ease-out) both;
   }
   ::view-transition-new(.page-in) {
-    animation: fade-in 220ms var(--ease-out) both;
+    animation: page-enter 250ms var(--ease-out) both;
   }
+  ::view-transition-group(.cover-morph) {
+    z-index: 5;
+    animation-duration: 540ms;
+    animation-timing-function: var(--ease-out);
+  }
+  ::view-transition-old(.cover-morph),
+  ::view-transition-new(.cover-morph) {
+    animation-timing-function: var(--ease-out);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) and (animation-range: 0px 1px) {
+    .hero-grid-paper,
+    .hero-contours {
+      animation: auto linear hero-parallax both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 40rem;
+    }
+    .hero-grid-paper { --drift: 2rem; }
+    .hero-contours { --drift: 7rem; }
+    .section-art-grid,
+    .section-art-detail {
+      animation: auto linear hero-parallax both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 24rem;
+    }
+    .project-showcase {
+      view-timeline-name: --project-showcase;
+    }
+    .project-artwork {
+      --drift: clamp(.48rem, 1.4vw, 1.1rem);
+      animation: auto linear project-parallax both;
+      animation-timeline: --project-showcase;
+    }
+  }
+}
+/*
+  Section mastheads. Entrance mirrors the home hero: the eyebrow types in, the title rises
+  out of a clip, the full stop lands, then copy and controls follow. The border is lit by a
+  pass of the section colour and the artwork assembles behind. Each section then settles into
+  a slow ambient loop. Interactive content cancels its entrance as soon as it takes focus.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  .section-masthead::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 1px;
+    pointer-events: none;
+    transform-origin: left;
+    background: linear-gradient(90deg, transparent, rgb(var(--section-ink) / .95) 70%, transparent);
+    animation: masthead-edge 900ms var(--ease-out) 120ms both;
+  }
+  .page-heading .eyebrow {
+    animation: type-in 520ms steps(18, end) both;
+  }
+  .page-heading h1 {
+    clip-path: inset(-.08em -.25em -.18em -.1em);
+  }
+  .page-heading .title-line {
+    animation: hero-line-in 700ms var(--ease-out) 70ms both;
+  }
+  .page-heading .title-dot {
+    animation: dot-land 520ms cubic-bezier(.34, 1.56, .64, 1) 430ms both;
+  }
+  .page-heading > .section-description {
+    animation: rise 500ms var(--ease-out) 200ms both;
+  }
+  .page-heading > :is(a, div, form, nav) {
+    animation: rise 560ms var(--ease-out) 270ms both;
+  }
+  .page-heading > :is(a, div, form, nav):focus-within {
+    animation: none;
+  }
+  .section-content {
+    animation: rise 560ms var(--ease-out) 300ms both;
+  }
+  .section-content:focus-within {
+    animation: none;
+  }
+  .section-art[data-idle="true"] *,
+  .section-art[data-idle="true"] *::before,
+  .section-art[data-idle="true"] *::after {
+    animation-play-state: paused;
+  }
+
+  /* About: rings open outward, then planets orbit on them. */
+  .about-rings {
+    animation: rings-open 1100ms var(--ease-out) both;
+  }
+  .orbit {
+    animation: orbit-x calc(var(--period) / 2) cubic-bezier(.37, 0, .63, 1) var(--phase) infinite alternate;
+  }
+  .orbit-y {
+    animation: orbit-y calc(var(--period) / 2) cubic-bezier(.37, 0, .63, 1) calc(var(--phase) - var(--period) / 4) infinite alternate;
+  }
+  .planet {
+    animation: planet-in 700ms var(--ease-out) 500ms both;
+  }
+
+  /* Writing: the two sheets slide into place, then the front sheet is written line by line. */
+  .writing-page .section-art-detail::before {
+    animation: sheet-in 800ms var(--ease-out) both;
+  }
+  .writing-page .section-art-detail::after,
+  .writing-ink {
+    --sheet-from: translate(5%, 9%) rotate(3deg);
+    animation: sheet-in 900ms var(--ease-out) 90ms both;
+  }
+  .ink-page {
+    animation: ink-page 16s linear 700ms infinite both;
+  }
+
+  /* Projects: frames are drafted in, then a plotter keeps retracing the outline. */
+  .projects-page .section-art-detail::before {
+    animation: frame-draft 900ms var(--ease-out) both;
+  }
+  .projects-page .section-art-detail::after {
+    animation: frame-draft 900ms var(--ease-out) 160ms both;
+  }
+  .draft-edge,
+  .draft-head {
+    animation: 7s cubic-bezier(.45, 0, .55, 1) 900ms infinite both;
+  }
+  .draft-top { animation-name: trace-top; }
+  .draft-right { animation-name: trace-right; }
+  .draft-bottom { animation-name: trace-bottom; }
+  .draft-left { animation-name: trace-left; }
+  .draft-head { animation-name: plot; }
+  .draft-scan {
+    animation: scan 9s cubic-bezier(.45, 0, .55, 1) 1.4s infinite both;
+  }
+
+  /* Progress: the grid powers on, then pulses and current ripple out from the charge. */
+  .field-glow {
+    animation: field-flicker 4.2s linear infinite both;
+  }
+  @supports (mask-image: radial-gradient(circle 1px, #000, transparent)) {
+    .field-wave {
+      mask-image: radial-gradient(
+        circle at var(--cx) var(--cy),
+        transparent calc(var(--wave) - 5rem),
+        #000 calc(var(--wave) - .5rem),
+        transparent var(--wave)
+      );
+      animation: field-wave 3.6s cubic-bezier(.2, .6, .35, 1) 200ms infinite both;
+    }
+  }
+  .progress-page .section-art-grid > .field-current,
+  .progress-page .section-art-grid > .field-node {
+    animation-duration: var(--duration);
+    animation-delay: var(--delay);
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+  }
+  .field-current-x {
+    animation-name: current-x;
+    animation-timing-function: cubic-bezier(.5, 0, .9, .6);
+  }
+  .field-current-y {
+    animation-name: current-y;
+    animation-timing-function: cubic-bezier(.5, 0, .9, .6);
+  }
+  .field-node {
+    animation-name: node-spark;
+    animation-timing-function: linear;
+  }
+  .progress-page .section-art-grid {
+    animation: grid-power 900ms steps(1, end) both;
+  }
+  @supports (animation-timeline: scroll()) and (animation-range: 0px 1px) {
+    .progress-page .section-art-grid {
+      animation:
+        grid-power 900ms steps(1, end) both,
+        auto linear hero-parallax both;
+      animation-timeline: auto, scroll(root block);
+      animation-range: normal, 0px 24rem;
+    }
+  }
+}
+@property --ink {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --wave {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@keyframes masthead-edge {
+  from { transform: scaleX(0); opacity: 1; }
+  65% { opacity: 1; }
+  to { transform: scaleX(1); opacity: 0; }
+}
+@keyframes type-in {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 -1em 0 0); }
+}
+@keyframes dot-land {
+  from { transform: translateY(-.55em) scale(.2); opacity: 0; }
+  60% { opacity: 1; }
+}
+@keyframes rings-open {
+  from { opacity: 0; transform: scale(.82); }
+}
+@keyframes orbit-x {
+  from { transform: translateX(calc(var(--rx) * -1)); }
+  to { transform: translateX(var(--rx)); }
+}
+@keyframes orbit-y {
+  from { transform: translateY(calc(var(--ry) * -1)); }
+  to { transform: translateY(var(--ry)); }
+}
+@keyframes planet-in {
+  from { opacity: 0; scale: 0; }
+}
+@keyframes sheet-in {
+  from { opacity: 0; transform: var(--sheet-from, translate(-4%, 6%) rotate(-2deg)); }
+}
+/* One clock for the page: line i is written during seconds 1.1i to 1.1i + 1, then the page clears. */
+@keyframes ink-page {
+  from { --ink: 0; opacity: 1; }
+  81% { opacity: 1; }
+  90%, to { --ink: 1; opacity: 0; }
+}
+@keyframes frame-draft {
+  from { clip-path: inset(0 100% 100% 0); opacity: .2; }
+  to { clip-path: inset(-30px); opacity: 1; }
+}
+/* Edges share plot's keyframe stops so each one grows exactly under the moving head. */
+@keyframes trace-top {
+  0% { opacity: 1; transform: scaleX(0); }
+  18%, 72% { opacity: 1; transform: scaleX(1); }
+  80%, to { opacity: 0; transform: scaleX(1); }
+}
+@keyframes trace-right {
+  0%, 18% { opacity: 1; transform: scaleY(0); }
+  36%, 72% { opacity: 1; transform: scaleY(1); }
+  80%, to { opacity: 0; transform: scaleY(1); }
+}
+@keyframes trace-bottom {
+  0%, 36% { opacity: 1; transform: scaleX(0); }
+  54%, 72% { opacity: 1; transform: scaleX(1); }
+  80%, to { opacity: 0; transform: scaleX(1); }
+}
+@keyframes trace-left {
+  0%, 54% { opacity: 1; transform: scaleY(0); }
+  72% { opacity: 1; transform: scaleY(1); }
+  80%, to { opacity: 0; transform: scaleY(1); }
+}
+@keyframes plot {
+  0% { transform: translate(0, 0); opacity: 0; }
+  4% { opacity: 1; transform: translate(0, 0); }
+  18% { transform: translate(100%, 0); }
+  36% { transform: translate(100%, 100%); }
+  54% { transform: translate(0, 100%); }
+  72% { transform: translate(0, 0); opacity: 1; }
+  80%, to { transform: translate(0, 0); opacity: 0; }
+}
+@keyframes scan {
+  from { transform: translateX(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  55% { transform: translateX(560%); opacity: 1; }
+  62%, to { transform: translateX(560%); opacity: 0; }
+}
+@keyframes field-flicker {
+  0%, 100% { opacity: .32; }
+  8% { opacity: .55; }
+  10% { opacity: .28; }
+  13% { opacity: .62; }
+  30% { opacity: .38; }
+  52% { opacity: .5; }
+  54% { opacity: .3; }
+  56% { opacity: .58; }
+  78% { opacity: .36; }
+}
+@keyframes field-wave {
+  from { --wave: 0px; opacity: .9; }
+  70% { opacity: .5; }
+  to { --wave: 34rem; opacity: 0; }
+}
+@keyframes current-x {
+  0% { opacity: 0; transform: scaleX(var(--dir)) translateX(0); }
+  4% { opacity: 1; }
+  38% { opacity: 1; }
+  45%, to { opacity: 0; transform: scaleX(var(--dir)) translateX(264px); }
+}
+@keyframes current-y {
+  0% { opacity: 0; transform: scaleY(var(--dir)) translateY(0); }
+  4% { opacity: 1; }
+  38% { opacity: 1; }
+  45%, to { opacity: 0; transform: scaleY(var(--dir)) translateY(176px); }
+}
+@keyframes node-spark {
+  0%, 30%, to { opacity: 0; transform: scale(.4); }
+  33% { opacity: 1; transform: scale(1.3); }
+  40% { opacity: .5; transform: scale(1); }
+  46% { opacity: 0; }
+}
+@keyframes grid-power {
+  0% { opacity: .15; }
+  12% { opacity: .9; }
+  20% { opacity: .3; }
+  34% { opacity: 1; }
+  44% { opacity: .55; }
+  60% { opacity: 1; }
+}
+@keyframes section-art-in {
+  from { opacity: .35; }
+}
+@keyframes hero-parallax {
+  from { translate: 0 0; }
+  to { translate: 0 var(--drift); }
+}
+@keyframes project-parallax {
+  from { translate: 0 calc(0px - var(--drift)); }
+  to { translate: 0 var(--drift); }
+}
+@keyframes project-image-in {
+  from { clip-path: inset(0 6%); }
+  to { clip-path: inset(0); }
+}
+@keyframes hero-line-in {
+  from { transform: translateY(.69em); }
+}
+@keyframes navigation-progress {
+  from { transform: scaleX(.22); }
+  to { transform: scaleX(.85); }
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(22px) scale(.985); }
+}
+@keyframes panel-edge-in {
+  from { opacity: 0; transform: scaleX(.12); }
+}
+@keyframes reveal-in {
+  from { opacity: .35; transform: translateY(20px); }
+}
+@keyframes chart-bar-in {
+  from { transform: scaleY(0); }
+}
+@keyframes light-pass {
+  from { opacity: 0; transform: translateX(-90%); }
+  28% { opacity: 1; }
+  to { opacity: 0; transform: translateX(90%); }
+}
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes menu-item-in {
+  from { opacity: .35; transform: translateX(-9px); }
 }
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(10px);
-  }
-}
-@keyframes rise-solid {
-  from {
     transform: translateY(10px);
   }
 }
@@ -1891,14 +2824,16 @@ figcaption {
     transform: translateY(6px);
   }
 }
-@keyframes fade-in {
+@keyframes page-enter {
   from {
-    opacity: 0;
+    opacity: .92;
+    transform: translateY(8px);
   }
 }
-@keyframes fade-out {
+@keyframes page-exit {
   to {
     opacity: 0;
+    transform: translateY(-4px);
   }
 }
 /* Route transitions: the header stays put while page content crossfades. */
@@ -1931,7 +2866,8 @@ figcaption {
   }
   ::view-transition-old(*),
   ::view-transition-new(*),
-  ::view-transition-group(*) {
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*) {
     animation-duration: 0s !important;
     animation-delay: 0s !important;
   }

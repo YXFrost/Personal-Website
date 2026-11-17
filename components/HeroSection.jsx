@@ -1,23 +1,37 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { site } from "@/lib/site";
 import { entryPath, formatDate } from "@/lib/utils.mjs";
 import HeroGlow from "./HeroGlow";
+
+const sections = [
+  ["projects", "Projects"],
+  ["writing", "Writing"],
+  ["study-logs", "Study logs"],
+];
+
 export default function HeroSection({ lead }) {
   const current = Object.entries(site.currently || {}).filter(
     ([key, value]) => key !== "updated" && value,
   );
   return (
     <section className="hero" id="home">
+      <div className="hero-backdrop" aria-hidden="true">
+        <div className="hero-grid-paper" />
+        <div className="hero-contours" />
+      </div>
       <HeroGlow />
       <div className="container hero-grid">
         <div>
-          <h1>I learn by <span>building.</span></h1>
+          <h1>
+            <span className="hero-line"><span>I learn by</span></span>{" "}
+            <span className="hero-line hero-line-accent"><span>building.</span></span>
+          </h1>
           <p className="hero-description">{site.description}</p>
           <div className="actions">
-            <Link className="button" href={lead ? entryPath(lead) : "/about"} aria-describedby={lead ? "hero-entry" : undefined}>
+            <NavigationLink className="button" href={lead ? entryPath(lead) : "/about"} prefetch aria-describedby={lead ? "hero-entry" : undefined}>
               {lead?._type === "writing" ? "Read the latest essay" : lead ? "Read the latest entry" : "About the notebook"}
               <span aria-hidden="true">→</span>
-            </Link>
+            </NavigationLink>
             {lead && <p className="hero-entry" id="hero-entry">{lead.title}</p>}
           </div>
         </div>
@@ -44,6 +58,18 @@ export default function HeroSection({ lead }) {
           )}
         </aside>
       </div>
+      <nav className="container home-index" aria-label="On this page">
+        <ul>
+          {sections.map(([id, label]) => (
+            <li key={id}>
+              <a href={`#${id}`}>
+                {label}
+                <span aria-hidden="true">↓</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </section>
   );
 }

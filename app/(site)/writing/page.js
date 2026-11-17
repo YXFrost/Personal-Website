@@ -5,6 +5,7 @@ import { facetCounts, filterEntries, isIndexable } from "@/lib/utils.mjs";
 import { isPublicSite } from "@/lib/site";
 import { pageMetadata } from "@/lib/metadata";
 import ArticleCard from "@/components/ArticleCard";
+import SectionPage from "@/components/SectionPage";
 export const metadata = pageMetadata(
   "Writing",
   "Essays and notes on books, mathematics, science, philosophy, and the ideas between them.",
@@ -15,17 +16,16 @@ export default async function WritingPage({ searchParams }) {
   const entries = await getEntries("writing");
   const categories = facetCounts(entries.map((d) => d.category));
   const filtered = filterEntries(entries, active);
+  const browsing = !active.q && !active.category && !active.tag;
   return (
-    <div className="container archive">
-      <header className="page-heading">
-        <h1>
-          Writing<span>.</span>
-        </h1>
-        <p>Essays on books, science, philosophy, and the questions they share.</p>
-        {isPublicSite && entries.some(isIndexable) && (
-          <a className="text-link feed-link" href="/feed.xml">Subscribe via RSS</a>
-        )}
-      </header>
+    <SectionPage
+      section="writing"
+      title="Writing"
+      description="Essays on books, science, philosophy, and the questions they share."
+      actions={isPublicSite && entries.some(isIndexable) && (
+        <a className="text-link feed-link" href="/feed.xml">Subscribe via RSS</a>
+      )}
+    >
       {entries.length > 0 && (
         <>
           <ArchiveFilters
@@ -52,8 +52,14 @@ export default async function WritingPage({ searchParams }) {
       )}
       <div id="writing-results" className="archive-results">
         {filtered.length ? (
-          filtered.map((d) => (
-            <ArticleCard headingLevel="h2" key={d._id} entry={d} filters={active} />
+          filtered.map((d, index) => (
+            <ArticleCard
+              headingLevel="h2"
+              key={d._id}
+              entry={d}
+              filters={active}
+              featured={browsing && index === 0 && Boolean(d.coverImage)}
+            />
           ))
         ) : (
           <div className="empty-state" data-reveal="">
@@ -77,6 +83,6 @@ export default async function WritingPage({ searchParams }) {
           </div>
         )}
       </div>
-    </div>
+    </SectionPage>
   );
 }

@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { Suspense } from "react";
+import NavigationLink from "./NavigationLink";
+import { Suspense, ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import { getEntry, getEntries } from "@/lib/content";
 import { site, absoluteUrl, preview } from "@/lib/site";
@@ -72,6 +72,17 @@ export default async function EntryPage({ type, slug }) {
   };
   const cover = imageInfo(entry.coverImage);
   if (cover) data.image = absoluteUrl(cover.src);
+  const coverFigure = entry.coverImage && (
+    <figure className={`entry-cover ${type === "project" ? "screenshot" : ""}`}>
+      <ResponsiveImage
+        image={entry.coverImage}
+        zoomable
+        eager
+        sizes="(max-width: 1024px) calc(100vw - 40px), 1000px"
+      />
+      {entry.coverImage.caption && <figcaption>{entry.coverImage.caption}</figcaption>}
+    </figure>
+  );
   return (
     <div className="container entry-page">
       <div className="read-progress" aria-hidden="true" />
@@ -81,12 +92,12 @@ export default async function EntryPage({ type, slug }) {
           dangerouslySetInnerHTML={{ __html: jsonLd(data) }}
         />
       )}
-      <Link
+      <NavigationLink
         className="back-link"
         href={type === "project" ? "/projects" : `/${type}`}
       >
         <span aria-hidden="true">←</span> All {labels[type].toLowerCase()}
-      </Link>
+      </NavigationLink>
       <Suspense>
         <ArchiveReturn archive={routes[type]} />
       </Suspense>
@@ -129,21 +140,11 @@ export default async function EntryPage({ type, slug }) {
             </div>
           )}
         </header>
-        {entry.coverImage && (
-          <figure
-            className={`entry-cover ${type === "project" ? "screenshot" : ""}`}
-          >
-            <ResponsiveImage
-              image={entry.coverImage}
-              zoomable
-              eager
-              sizes="(max-width: 1024px) calc(100vw - 40px), 1000px"
-            />
-            {entry.coverImage.caption && (
-              <figcaption>{entry.coverImage.caption}</figcaption>
-            )}
-          </figure>
-        )}
+        {type === "project" && coverFigure ? (
+          <ViewTransition name={`project-cover-${entry.slug}`} share="cover-morph" default="none">
+            {coverFigure}
+          </ViewTransition>
+        ) : coverFigure}
         <div className={`reading-layout ${toc ? "has-toc" : ""}`}>
           {toc && <Toc headings={headings} />}
           <div className="reading-body">
@@ -222,9 +223,9 @@ export default async function EntryPage({ type, slug }) {
             )}
             <div className="article-end">
               <span aria-hidden="true">■</span>
-              <Link href={type === "project" ? "/projects" : `/${type}`}>
+              <NavigationLink href={type === "project" ? "/projects" : `/${type}`}>
                 Back to {labels[type].toLowerCase()} →
-              </Link>
+              </NavigationLink>
             </div>
           </div>
         </div>

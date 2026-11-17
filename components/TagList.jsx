@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 // Each label links to its archive filtered by that label.
 export default function TagList({ tags = [], basePath, label = "Tags" }) {
   if (!tags.length) return null;
@@ -6,9 +6,9 @@ export default function TagList({ tags = [], basePath, label = "Tags" }) {
     <ul className="tags" aria-label={label}>
       {tags.map((t) => (
         <li key={t}>
-          <Link className="tag-link" href={`${basePath}?tag=${encodeURIComponent(t)}`}>
+          <NavigationLink className="tag-link" href={`${basePath}?tag=${encodeURIComponent(t)}`}>
             {t}
-          </Link>
+          </NavigationLink>
         </li>
       ))}
     </ul>

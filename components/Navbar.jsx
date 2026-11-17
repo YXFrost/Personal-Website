@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
@@ -15,13 +15,14 @@ function NavigationLinks({ pathname, onClick }) {
     <ul className="nav-links">
       {links.map(([href, label]) => (
         <li key={href}>
-          <Link
+          <NavigationLink
             href={href}
+            prefetch={pathname !== href}
             onClick={onClick}
             aria-current={pathname === href ? "page" : pathname.startsWith(href + "/") ? "location" : undefined}
           >
             {label}
-          </Link>
+          </NavigationLink>
         </li>
       ))}
     </ul>
@@ -63,15 +64,19 @@ function Navigation({ pathname }) {
       }}
     >
       <nav className="container nav" aria-label="Main navigation">
-        <Link href="/" className="wordmark" aria-label="YN — homepage" onClick={closeMenu}>
+        <NavigationLink href="/" className="wordmark" aria-label="YN — homepage" onClick={closeMenu}>
           YN<span>.</span>
-        </Link>
+        </NavigationLink>
         <div className="desktop-nav">
           <NavigationLinks pathname={pathname} />
         </div>
         <details
           ref={mobile}
           className="mobile-nav"
+          onToggle={(event) => {
+            const menu = event.currentTarget;
+            menu.toggleAttribute("data-motion", menu.open);
+          }}
           onBlur={(event) => {
             if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
           }}

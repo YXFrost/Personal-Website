@@ -1,10 +1,10 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { entryPath, formatDate } from "@/lib/utils.mjs";
 function Item({ entry, direction, monthly }) {
   const older = direction === "older";
   const when = monthly ? formatDate(entry.month || entry.publishedAt, true) : "";
   return (
-    <Link className={`pager-link pager-${direction}`} href={entryPath(entry)}>
+    <NavigationLink className={`pager-link pager-${direction}`} href={entryPath(entry)}>
       <span className="pager-label">
         {older && <span aria-hidden="true">←</span>}
         {older ? "Older" : "Newer"}
@@ -12,7 +12,7 @@ function Item({ entry, direction, monthly }) {
         {!older && <span aria-hidden="true">→</span>}
       </span>
       <span className="pager-title">{entry.title}</span>
-    </Link>
+    </NavigationLink>
   );
 }
 // Previous/next entries of the same type; renders nothing without a neighbour.

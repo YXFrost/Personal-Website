@@ -1,4 +1,4 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import ResponsiveImage from "./ResponsiveImage";
 import TagList from "./TagList";
 import { archiveEntryPath, formatDate } from "@/lib/utils.mjs";
@@ -19,7 +19,7 @@ export default function ArticleCard({
           <ResponsiveImage
             image={entry.coverImage}
             decorative
-            sizes="(max-width: 768px) calc(100vw - 40px), 560px"
+            sizes="(max-width: 768px) calc(100vw - 40px), (max-width: 1280px) 37vw, 475px"
           />
         </div>
       )}
@@ -34,10 +34,10 @@ export default function ArticleCard({
           <span>{entry.readingTime} min read</span>
         </div>
         <Heading>
-          <Link className="card-title" href={archiveEntryPath(entry, filters)} prefetch={false}>
+          <NavigationLink className="card-title" href={archiveEntryPath(entry, filters)} prefetchOnIntent>
             {entry.title}{" "}
             <span aria-hidden="true">→</span>
-          </Link>
+          </NavigationLink>
         </Heading>
         <p>{entry.summary}</p>
         <TagList tags={entry.tags} basePath="/writing" label="Tags" />

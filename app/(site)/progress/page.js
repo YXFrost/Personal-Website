@@ -2,8 +2,9 @@ import { getEntries } from "@/lib/content";
 import { pageMetadata } from "@/lib/metadata";
 import ProgressCard from "@/components/ProgressCard";
 import ArchiveFilters, { ArchiveCount, readFilters } from "@/components/ArchiveFilters";
-import Link from "next/link";
 import HoursChart from "@/components/HoursChart";
+import NavigationLink from "@/components/NavigationLink";
+import SectionPage from "@/components/SectionPage";
 import {
   facetCounts,
   filterEntries,
@@ -33,13 +34,16 @@ export default async function ProgressPage({ searchParams }) {
     return groups;
   }, {});
   return (
-    <div className="container archive">
-      <header className="page-heading">
-        <h1>
-          Progress<span>.</span>
-        </h1>
-        <p>Monthly study logs, reflections, and what I’m learning next.</p>
-      </header>
+    <SectionPage
+      section="progress"
+      title="Progress"
+      description="Monthly study logs, reflections, and what I’m learning next."
+      actions={entries.length > 0 && (
+        <a className="text-link masthead-jump" href="#study-logs">
+          Jump to study logs <span aria-hidden="true">↓</span>
+        </a>
+      )}
+    >
       {entries.length > 0 && (
         <section aria-labelledby="progress-overview">
           <h2 id="progress-overview" className="overview-title">Archive overview</h2>
@@ -64,42 +68,47 @@ export default async function ProgressPage({ searchParams }) {
               </div>
             )}
           </dl>
-          {totals.length > 0 && (
-            <div className="subject-totals" data-reveal="">
-              <h3>Study logs by subject</h3>
-              <ul>
-                {totals.map((t) => (
-                  <li key={t.subject}>
-                    <Link href={`/progress?tag=${encodeURIComponent(t.subject)}`} prefetch={false}>
-                      {t.subject}
-                    </Link>
-                    <span>
-                      {t.logs} {t.logs === 1 ? "log" : "logs"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+          {(months.length > 0 || totals.length > 0) && (
+            <div className="progress-breakdown">
+              <HoursChart months={months} />
+              {totals.length > 0 && (
+                <div className="subject-totals" data-reveal="">
+                  <h3>Study logs by subject</h3>
+                  <ul>
+                    {totals.map((t) => (
+                      <li key={t.subject}>
+                        <NavigationLink href={`/progress?tag=${encodeURIComponent(t.subject)}`} prefetchOnIntent>
+                          {t.subject}
+                        </NavigationLink>
+                        <span>{t.logs} {t.logs === 1 ? "log" : "logs"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
-          <HoursChart months={months} />
         </section>
       )}
       {entries.length > 0 && (
-        <ArchiveFilters
-          basePath="/progress"
-          label="Subjects"
-          active={active}
-          facets={{ param: "tag", values: subjectFacets, allLabel: "All subjects" }}
-          showChips={subjectFacets.length > 1 || entries.length > 6}
-          search={
-            showSearch && {
-              id: "progress-search",
-              label: "Find a log or subject",
-              placeholder: "Search titles, summaries, subjects…",
+        <>
+          <h2 id="study-logs" className="overview-title" tabIndex={-1}>Study logs</h2>
+          <ArchiveFilters
+            basePath="/progress"
+            label="Subjects"
+            active={active}
+            facets={{ param: "tag", values: subjectFacets, allLabel: "All subjects" }}
+            showChips={subjectFacets.length > 1 || entries.length > 6}
+            search={
+              showSearch && {
+                id: "progress-search",
+                label: "Find a log or subject",
+                placeholder: "Search titles, summaries, subjects…",
+              }
             }
-          }
-          resultsId="progress-results"
-        />
+            resultsId="progress-results"
+          />
+        </>
       )}
       {entries.length > 0 && (
         <ArchiveCount
@@ -134,10 +143,12 @@ export default async function ProgressPage({ searchParams }) {
               Monthly logs will bring together study, books, projects,
               difficulties, and next steps.
             </p>
-            <Link className="text-link" href="/writing">Browse writing <span aria-hidden="true">→</span></Link>
+            <NavigationLink className="text-link" href="/writing" prefetchOnIntent>
+              Browse writing <span aria-hidden="true">→</span>
+            </NavigationLink>
           </div>
         )}
       </div>
-    </div>
+    </SectionPage>
   );
 }
