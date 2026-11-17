@@ -39,11 +39,11 @@ export const core = [
   { name: "summary", type: "text", rows: 3 },
   {
     name: "published",
-    title: "Visible on website",
+    title: "Show on the public website",
     type: "boolean",
     initialValue: true,
     description:
-      "Uncheck to hide a published document. Sanity drafts are always excluded.",
+      "Controls whether the website shows this entry. Published documents remain readable through a public dataset’s API. Keep private text unpublished and avoid uploading private files to the public asset CDN.",
   },
   {
     name: "publishedAt",
@@ -64,6 +64,13 @@ export const seo = {
     { name: "title", type: "string" },
     { name: "description", type: "text", rows: 3 },
     image("image"),
+    {
+      name: "noindex",
+      title: "Hide from search engines, sitemap and feed",
+      type: "boolean",
+      initialValue: false,
+      description: "The entry remains publicly readable by its URL when it is shown on the website.",
+    },
   ],
 };
 export const references = {

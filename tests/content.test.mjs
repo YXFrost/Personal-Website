@@ -10,6 +10,13 @@ import {
   escapeXml,
   jsonLd,
   entryPath,
+  getHeadings,
+  isIndexable,
+  filterEntries,
+  facetCounts,
+  adjacentEntries,
+  hoursByMonth,
+  subjectTotals,
 } from "../lib/utils.mjs";
 test("legacy project records retain their URLs, write-up, images and links", () => {
   const old = {
@@ -106,4 +113,91 @@ test('offline migration preserves originals and generates explicit URL redirects
     assert.equal(migrated._id,'progress.log-1');assert.equal(migrated._type,'progress');assert.deepEqual(migrated.body,original.longDescription);assert.deepEqual(migrated.coverImage,original.image);
     assert.deepEqual(JSON.parse(readFileSync(join(dir,'legacy-routes.json'))),[{source:'/projects/january',destination:'/progress/january'}]);
   } finally {rmSync(dir,{recursive:true,force:true});}
+});
+test("legacy h1 sections appear in the table of contents as h2", () => {
+  const block = (style, text, _key) => ({ _type: "block", style, _key, children: [{ text }] });
+  const headings = getHeadings([
+    block("h1", "Part one", "a"),
+    block("normal", "Body text", "b"),
+    block("h1", "Part two", "c"),
+    block("h3", "Detail", "d"),
+    block("h2", "Part three", "e"),
+    block("h4", "Too deep", "f"),
+    { _type: "code", code: "x" },
+  ]);
+  assert.deepEqual(headings, [
+    { id: "section-a", title: "Part one", level: "h2" },
+    { id: "section-c", title: "Part two", level: "h2" },
+    { id: "section-d", title: "Detail", level: "h3" },
+    { id: "section-e", title: "Part three", level: "h2" },
+  ]);
+});
+test("entries marked noindex are excluded from sitemap and feed filters", () => {
+  const entries = [
+    { slug: "open" },
+    { slug: "seo-empty", seo: {} },
+    { slug: "hidden", seo: { noindex: true } },
+    { slug: "explicit", seo: { noindex: false } },
+  ];
+  assert.deepEqual(
+    entries.filter(isIndexable).map((d) => d.slug),
+    ["open", "seo-empty", "explicit"],
+  );
+});
+test("archive filters combine search, category and tag across entry types", () => {
+  const docs = [
+    { _type: "writing", slug: "a", title: "On Proofs", summary: "Induction", category: "Essay", tags: ["Mathematics", "Logic"] },
+    { _type: "writing", slug: "b", title: "Margins", summary: "Short notes", category: "Note", tags: ["Reading"] },
+    { _type: "project", slug: "c", title: "Site", summary: "Next.js", status: "Active", technologies: ["React", "CSS"], tags: [] },
+    { _type: "progress", slug: "d", title: "May", summary: "Study", subjects: ["Mathematics"] },
+  ];
+  const slugs = (opts) => filterEntries(docs, opts).map((d) => d.slug);
+  assert.deepEqual(slugs({}), ["a", "b", "c", "d"]);
+  assert.deepEqual(slugs({ tag: "mathematics" }), ["a", "d"]);
+  assert.deepEqual(slugs({ tag: "react" }), ["c"]);
+  assert.deepEqual(slugs({ q: "LOGIC" }), ["a"]);
+  assert.deepEqual(slugs({ q: "notes", category: "Note" }), ["b"]);
+  assert.deepEqual(slugs({ q: "proofs", tag: "Reading" }), []);
+  assert.deepEqual(slugs({ category: "Active", categoryField: "status" }), ["c"]);
+  assert.deepEqual(facetCounts(["B", "A", "B", "", undefined, "C"]), [
+    { value: "B", count: 2 },
+    { value: "A", count: 1 },
+    { value: "C", count: 1 },
+  ]);
+});
+test("adjacent entries follow newest-first order and stop at the ends", () => {
+  const list = [{ slug: "new" }, { slug: "mid" }, { slug: "old" }];
+  assert.deepEqual(adjacentEntries(list, "mid"), { newer: list[0], older: list[2] });
+  assert.deepEqual(adjacentEntries(list, "new"), { newer: null, older: list[1] });
+  assert.deepEqual(adjacentEntries(list, "old"), { newer: list[1], older: null });
+  assert.deepEqual(adjacentEntries(list, "missing"), { newer: null, older: null });
+});
+test("hours chart covers the twelve months up to the newest log", () => {
+  const log = (month, studyHours, subjects = []) => ({ month, studyHours, subjects, slug: month });
+  assert.deepEqual(hoursByMonth([]), []);
+  assert.deepEqual(hoursByMonth([log("2026-08-01", 42)]), []);
+  assert.deepEqual(hoursByMonth([log("2026-08-01", 42), { month: "2026-07-01", slug: "x" }]), []);
+  const months = hoursByMonth([log("2026-08-01", 42), log("2026-06-01", 18), log("2025-12-01", 24), log("2024-01-01", 99)]);
+  assert.equal(months.length, 12);
+  assert.equal(months[0].key, "2025-09");
+  assert.equal(months.at(-1).key, "2026-08");
+  assert.equal(months.at(-1).label, "August 2026");
+  assert.equal(months.at(-1).initial, "A");
+  assert.deepEqual(months.map((m) => m.hours), [null, null, null, 24, null, null, null, null, null, 18, null, 42]);
+  const two = hoursByMonth([log("2026-08-01", 10), log("2026-08-15", 5)]);
+  assert.equal(two.at(-1).hours, 15);
+  assert.equal(two.at(-1).entries.length, 2);
+  assert.equal(filterEntries(two.at(-1).entries, { month: "2026-08" }).length, 2);
+});
+test("subject totals count logs by subject once per log", () => {
+  const totals = subjectTotals([
+    { subjects: ["Mathematics", "Literature"], studyHours: 42 },
+    { subjects: ["Mathematics"], studyHours: 24 },
+    { subjects: ["Physics", "Physics"] },
+  ]);
+  assert.deepEqual(totals, [
+    { subject: "Mathematics", logs: 2 },
+    { subject: "Literature", logs: 1 },
+    { subject: "Physics", logs: 1 },
+  ]);
 });

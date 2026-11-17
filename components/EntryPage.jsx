@@ -1,9 +1,15 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
+import { Suspense, ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import { getEntry, getEntries } from "@/lib/content";
 import { site, absoluteUrl, preview } from "@/lib/site";
-import { entryPath, formatDate, safeUrl, jsonLd } from "@/lib/utils.mjs";
+import { entryPath, formatDate, safeUrl, jsonLd, adjacentEntries, routes } from "@/lib/utils.mjs";
 import ArticleRenderer, { getHeadings } from "./ArticleRenderer";
+import Toc from "./Toc";
+import TagList from "./TagList";
+import EntryPager from "./EntryPager";
+import ArchiveReturn from "./ArchiveReturn";
+import ProjectCard from "./ProjectCard";
 import ResponsiveImage from "./ResponsiveImage";
 import ArticleCard from "./ArticleCard";
 import { imageInfo } from "@/lib/images";
@@ -30,10 +36,13 @@ export default async function EntryPage({ type, slug }) {
   const entry = await getEntry(type, slug);
   if (!entry) notFound();
   const headings = getHeadings(entry.body);
+  const entryTags = (type === "project" ? entry.technologies : entry.tags) || [];
   const toc = headings.length >= 4;
+  const siblings = await getEntries(type);
+  const { newer, older } = adjacentEntries(siblings, slug);
   const related =
     type === "writing"
-      ? (await getEntries("writing"))
+      ? siblings
           .filter(
             (d) =>
               d.slug !== slug &&
@@ -41,7 +50,15 @@ export default async function EntryPage({ type, slug }) {
                 d.tags.some((t) => entry.tags.includes(t))),
           )
           .slice(0, 2)
-      : [];
+      : type === "project"
+        ? siblings
+            .filter(
+              (d) =>
+                d.slug !== slug &&
+                d.technologies.some((t) => entry.technologies.includes(t)),
+            )
+            .slice(0, 2)
+        : [];
   const data = {
     "@context": "https://schema.org",
     "@type": type === "writing" ? "BlogPosting" : "CreativeWork",
@@ -55,20 +72,35 @@ export default async function EntryPage({ type, slug }) {
   };
   const cover = imageInfo(entry.coverImage);
   if (cover) data.image = absoluteUrl(cover.src);
+  const coverFigure = entry.coverImage && (
+    <figure className={`entry-cover ${type === "project" ? "screenshot" : ""}`}>
+      <ResponsiveImage
+        image={entry.coverImage}
+        zoomable
+        eager
+        sizes="(max-width: 1024px) calc(100vw - 40px), 1000px"
+      />
+      {entry.coverImage.caption && <figcaption>{entry.coverImage.caption}</figcaption>}
+    </figure>
+  );
   return (
     <div className="container entry-page">
+      <div className="read-progress" aria-hidden="true" />
       {!preview && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLd(data) }}
         />
       )}
-      <Link
+      <NavigationLink
         className="back-link"
         href={type === "project" ? "/projects" : `/${type}`}
       >
-        ← All {labels[type].toLowerCase()}
-      </Link>
+        <span aria-hidden="true">←</span> All {labels[type].toLowerCase()}
+      </NavigationLink>
+      <Suspense>
+        <ArchiveReturn archive={routes[type]} />
+      </Suspense>
       <article>
         <header className="entry-header">
           <p className="eyebrow">
@@ -79,8 +111,8 @@ export default async function EntryPage({ type, slug }) {
           <p className="entry-summary">{entry.summary}</p>
           <div className="meta">
             {entry.publishedAt && (
-              <time dateTime={entry.publishedAt}>
-                {formatDate(entry.publishedAt)}
+              <time dateTime={entry.month || entry.publishedAt}>
+                {formatDate(entry.month || entry.publishedAt, Boolean(entry.month))}
               </time>
             )}
             {type === "writing" && <span>{entry.readingTime} min read</span>}
@@ -88,62 +120,33 @@ export default async function EntryPage({ type, slug }) {
               <span>Updated {formatDate(entry.updatedAt)}</span>
             )}
           </div>
-          <ul
-            className="tags"
-            aria-label={type === "project" ? "Technologies" : "Tags"}
-          >
-            {(type === "project" ? entry.technologies : entry.tags).map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
+          <TagList
+            tags={entryTags}
+            basePath={routes[type]}
+            label={type === "project" ? "Technologies" : "Tags"}
+          />
           {type === "project" && (
             <div className="actions">
               {safeUrl(entry.githubUrl) && (
                 <a className="button secondary" href={entry.githubUrl}>
-                  Source on GitHub ↗
+                  Source on GitHub <span aria-hidden="true" data-arrow="ne">↗</span>
                 </a>
               )}
               {safeUrl(entry.demoUrl) && (
                 <a className="button secondary" href={entry.demoUrl}>
-                  Open project ↗
+                  Open project <span aria-hidden="true" data-arrow="ne">↗</span>
                 </a>
               )}
             </div>
           )}
         </header>
-        {entry.coverImage && (
-          <figure
-            className={`entry-cover ${type === "project" ? "screenshot" : ""}`}
-          >
-            <ResponsiveImage
-              image={entry.coverImage}
-              zoomable={type === "project"}
-              priority
-              sizes="(max-width: 1024px) calc(100vw - 40px), 1000px"
-            />
-            {entry.coverImage.caption && (
-              <figcaption>{entry.coverImage.caption}</figcaption>
-            )}
-          </figure>
-        )}
+        {type === "project" && coverFigure ? (
+          <ViewTransition name={`project-cover-${entry.slug}`} share="cover-morph" default="none">
+            {coverFigure}
+          </ViewTransition>
+        ) : coverFigure}
         <div className={`reading-layout ${toc ? "has-toc" : ""}`}>
-          {toc && (
-            <aside className="toc">
-              <nav aria-label="On this page">
-                <h2>On this page</h2>
-                <ol>
-                  {headings.map((h) => (
-                    <li
-                      key={h.id}
-                      className={h.level === "h3" ? "toc-nested" : ""}
-                    >
-                      <a href={`#${h.id}`}>{h.title}</a>
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            </aside>
-          )}
+          {toc && <Toc headings={headings} />}
           <div className="reading-body">
             {type === "progress" && (
               <div className="progress-facts">
@@ -220,19 +223,30 @@ export default async function EntryPage({ type, slug }) {
             )}
             <div className="article-end">
               <span aria-hidden="true">■</span>
-              <Link href={type === "project" ? "/projects" : `/${type}`}>
+              <NavigationLink href={type === "project" ? "/projects" : `/${type}`}>
                 Back to {labels[type].toLowerCase()} →
-              </Link>
+              </NavigationLink>
             </div>
           </div>
         </div>
       </article>
-      {related.length > 0 && (
+      <EntryPager newer={newer} older={older} monthly={type === "progress"} />
+      {related.length > 0 && type === "writing" && (
         <section className="section related">
           <h2>Keep exploring</h2>
           {related.map((d) => (
             <ArticleCard key={d._id} entry={d} />
           ))}
+        </section>
+      )}
+      {related.length > 0 && type === "project" && (
+        <section className="section related">
+          <h2>Related projects</h2>
+          <div className="project-grid">
+            {related.map((d) => (
+              <ProjectCard key={d._id} entry={d} />
+            ))}
+          </div>
         </section>
       )}
     </div>

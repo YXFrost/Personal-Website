@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "source": "/projects/literary-review-and-analysis-of-crime-and-punishment",
+    "destination": "/writing/literary-review-and-analysis-of-crime-and-punishment",
+    "documentId": "8d9186d2-2ead-4281-9bd0-36ef07eba3e7",
+    "category": "Literature",
+    "summary": "A reading of Crime and Punishment through Raskolnikov’s reasoning, the novel’s psychology, and its treatment of guilt and redemption.",
+    "coverAlt": "Cover of Crime and Punishment by Fyodor Dostoevsky"
+  },
+  {
+    "source": "/projects/march-2026-study-log",
+    "destination": "/progress/march-2026-study-log",
+    "documentId": "006e0055-44b8-4094-8335-797898765017",
+    "month": "2026-03-01",
+    "subjects": ["Mathematics", "Physics"],
+    "images": {
+      "bd0f3ff95925": {
+        "alt": "Study tracker dashboard with a 19-day streak and a breakdown of study time by subject.",
+        "caption": "The dashboard shows 145 h 7 min across 138 sessions, an average session of 1 h 3 min, and a 19-day streak. Mathematics and Physics have the longest bars, followed by Chinese and School."
+      },
+      "8f58e235e646": {
+        "alt": "2026 study calendar and monthly activity chart with recorded activity concentrated in March.",
+        "caption": "The year view shows 145 h 8 min recorded in 2026 at the time of the screenshot. The chart peaks in March, when the recorded study days cluster."
+      }
+    }
+  },
+  {
+    "source": "/projects/april-2026-study-log",
+    "destination": "/progress/april-2026-study-log",
+    "documentId": "d4f556be-e590-474d-a6d4-a0e2f415f262",
+    "month": "2026-04-01",
+    "subjects": ["Mathematics", "Physics"]
+  }
+]

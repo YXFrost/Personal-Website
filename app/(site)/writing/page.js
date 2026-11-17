@@ -1,117 +1,88 @@
 import Link from "next/link";
+import ArchiveFilters, { ArchiveCount, readFilters } from "@/components/ArchiveFilters";
 import { getEntries } from "@/lib/content";
+import { facetCounts, filterEntries, isIndexable } from "@/lib/utils.mjs";
+import { isPublicSite } from "@/lib/site";
 import { pageMetadata } from "@/lib/metadata";
 import ArticleCard from "@/components/ArticleCard";
+import SectionPage from "@/components/SectionPage";
 export const metadata = pageMetadata(
   "Writing",
   "Essays and notes on books, mathematics, science, philosophy, and the ideas between them.",
   "/writing",
 );
 export default async function WritingPage({ searchParams }) {
-  const params = await searchParams;
-  const query = typeof params?.q === "string" ? params.q.slice(0, 150) : "";
-  const category = typeof params?.category === "string" ? params.category : "";
+  const active = readFilters(await searchParams);
   const entries = await getEntries("writing");
-  const categories = [
-    ...new Set(entries.map((d) => d.category).filter(Boolean)),
-  ].sort();
-  const filtered = entries.filter(
-    (d) =>
-      (!category || d.category === category) &&
-      `${d.title} ${d.summary} ${d.tags.join(" ")}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
-  const filterUrl = (c) => {
-    const p = new URLSearchParams();
-    if (query) p.set("q", query);
-    if (c) p.set("category", c);
-    return `/writing${p.size ? `?${p}` : ""}`;
-  };
+  const categories = facetCounts(entries.map((d) => d.category));
+  const filtered = filterEntries(entries, active);
+  const browsing = !active.q && !active.category && !active.tag;
   return (
-    <div className="container archive">
-      <header className="page-heading">
-        <p className="eyebrow">01 / The publication</p>
-        <h1>
-          Writing<span>.</span>
-        </h1>
-        <p>
-          Thinking things through, one essay at a time.
-          <br />
-          Books, science, philosophy, and the connections between them.
-        </p>
-      </header>
-      <form
-        action="/writing"
-        method="get"
-        className="search-form"
-        role="search"
-      >
-        <label htmlFor="writing-search">Find an essay or topic</label>
-        <div>
-          <input
-            id="writing-search"
-            name="q"
-            type="search"
-            defaultValue={query}
-            placeholder="Search titles, summaries, tags…"
-            maxLength={150}
+    <SectionPage
+      section="writing"
+      title="Writing"
+      description="Essays on books, science, philosophy, and the questions they share."
+      actions={isPublicSite && entries.some(isIndexable) && (
+        <a className="text-link feed-link" href="/feed.xml">Subscribe via RSS</a>
+      )}
+    >
+      {entries.length > 0 && (
+        <>
+          <ArchiveFilters
+            basePath="/writing"
+            label="Writing categories"
+            active={active}
+            facets={{ param: "category", values: categories, allLabel: "All topics" }}
+            showChips={categories.length > 1 || entries.length > 6}
+            search={{
+              id: "writing-search",
+              label: "Find an essay or topic",
+              placeholder: "Search titles, summaries, tags…",
+            }}
+            resultsId="writing-results"
           />
-          {category && <input name="category" type="hidden" value={category} />}
-          <button className="button secondary" type="submit">
-            Search
-          </button>
-        </div>
-      </form>
-      {categories.length > 0 && (
-        <nav className="filters" aria-label="Writing categories">
-          <Link
-            href={filterUrl("")}
-            aria-current={!category ? "page" : undefined}
-          >
-            All topics
-          </Link>
-          {categories.map((c) => (
+          <ArchiveCount
+            count={filtered.length}
+            noun={["entry", "entries"]}
+            active={active}
+            basePath="/writing"
+            searchId="writing-search"
+          />
+        </>
+      )}
+      <div id="writing-results" className="archive-results">
+        {filtered.length ? (
+          filtered.map((d, index) => (
+            <ArticleCard
+              headingLevel="h2"
+              key={d._id}
+              entry={d}
+              filters={active}
+              featured={browsing && index === 0 && Boolean(d.coverImage)}
+            />
+          ))
+        ) : (
+          <div className="empty-state" data-reveal="">
+            <h2>
+              {entries.length
+                ? "No matching essays."
+                : "No essays yet."}
+            </h2>
+            <p>
+              {entries.length
+                ? "Try a different phrase or clear the filters."
+                : "In the meantime, browse the study logs or see what I’m building."}
+            </p>
             <Link
-              key={c}
-              href={filterUrl(c)}
-              aria-current={category === c ? "page" : undefined}
+              className="text-link"
+              href={entries.length ? "/writing" : "/progress"}
             >
-              {c}
+              {entries.length ? "See all writing" : "Browse study logs"}{" "}
+              <span aria-hidden="true">→</span>
             </Link>
-          ))}
-        </nav>
-      )}
-      <div className="archive-count">
-        {filtered.length} {filtered.length === 1 ? "entry" : "entries"}
-        {query ? ` matching “${query}”` : ""}
-        {(query || category) && <Link href="/writing">Clear filters ×</Link>}
+          </div>
+        )}
       </div>
-      {filtered.length ? (
-        filtered.map((d) => (
-          <ArticleCard headingLevel="h2" key={d._id} entry={d} />
-        ))
-      ) : (
-        <div className="empty-state">
-          <p className="eyebrow">An open page</p>
-          <h2>
-            {entries.length
-              ? "No matching essays."
-              : "The writing starts here."}
-          </h2>
-          <p>
-            {entries.length
-              ? "Try a different phrase or clear the filters."
-              : "A place for considered thoughts and useful questions. Essays will appear here when they’re ready."}
-          </p>
-          <Link
-            className="text-link"
-            href={entries.length ? "/writing" : "/projects"}
-          >
-            {entries.length ? "See all writing" : "Explore the projects"} →
-          </Link>
-        </div>
-      )}
-    </div>
+    </SectionPage>
   );
 }

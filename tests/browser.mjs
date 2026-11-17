@@ -30,11 +30,25 @@ page.on("pageerror", (e) => errors.push(e.message));
 page.on("console", (m) => {
   if (m.type() === "error" || m.type() === "warning") errors.push(m.text());
 });
-const routes = [
+async function findImageRoute() {
+  if (process.env.TEST_PROJECT) return process.env.TEST_PROJECT;
+  const archives = await Promise.all(["projects", "writing", "progress"].map(async (section) => {
+    const html = await (await fetch(base + "/" + section)).text();
+    return html.match(/\/(?:projects|writing|progress)\/[a-z0-9-]+(?=")/g) || [];
+  }));
+  const slugs = new Set(archives.flat());
+  for (const route of slugs) {
+    const detail = await (await fetch(base + route)).text();
+    if (detail.includes("Enlarge image")) return route;
+  }
+  throw new Error("No entry with an enlargeable image found");
+}
+const projectRoute = await findImageRoute();
+const routes = [...new Set([
   "/",
   "/writing",
   "/projects",
-  "/projects/personal-website",
+  projectRoute,
   "/progress",
   "/about",
   ...(preview
@@ -46,7 +60,7 @@ const routes = [
         "/projects/legacy-compatibility",
       ]
     : []),
-];
+])];
 const results = {
   preview,
   zoomMode: nativeZoom
@@ -89,8 +103,22 @@ try {
   await page.setViewportSize({ width: 1440, height: 1000 });
   for (const route of routes) {
     await page.goto(base + route, { waitUntil: "load" });
+    // Audit the settled page: entrance animations fade text in over up to ~740ms.
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          // Time-based and finite only: the scroll-driven reading bar never "finishes".
+          .filter(
+            (a) =>
+              a.timeline === document.timeline &&
+              a.effect?.getComputedTiming().iterations !== Infinity,
+          )
+          .map((a) => a.finished.catch(() => {})),
+      ),
+    );
     const axe = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21aa", "best-practice"])
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
       .analyze();
     results.accessibility.push({
       route,
@@ -114,25 +142,37 @@ try {
   assert.equal(await page.locator(":focus").textContent(), "Skip to content");
   await page.keyboard.press("Enter");
   assert.equal(await page.locator(":focus").getAttribute("id"), "main-content");
-  await page.goto(base + "/projects/personal-website");
+  await page.goto(base + projectRoute);
   const imageTrigger = page.getByRole("button", { name: /^Enlarge image/ }).first();
   await imageTrigger.focus();
   await page.keyboard.press("Enter");
   assert.ok(await page.getByRole("dialog").isVisible());
+  assert.ok(await page.evaluate(() => Boolean(document.activeElement?.closest("dialog"))));
+  // A native modal dialog makes the page inert. Tabbing past its last control may move
+  // focus to the browser UI (activeElement becomes <body>); it must never reach page content.
   for (let i = 0; i < 3; i++) {
     await page.keyboard.press("Tab");
-    assert.ok(await page.locator(":focus").evaluate((node) => Boolean(node.closest("dialog"))));
+    assert.ok(
+      await page.evaluate(() => {
+        const node = document.activeElement;
+        return !node || node === document.body || Boolean(node.closest("dialog"));
+      }),
+      "Focus escaped the image dialog onto page content",
+    );
   }
   await page.keyboard.press("Escape");
-  assert.equal(await page.getByRole("dialog").count(), 0);
+  // Focus returns at once; the dialog then fades out (280ms) before it leaves the page.
   assert.ok(await imageTrigger.evaluate((node) => node === document.activeElement));
+  await page.getByRole("dialog").waitFor({ state: "hidden", timeout: 2000 });
+  assert.equal(await page.getByRole("dialog").count(), 0);
   assert.notEqual(await page.evaluate(() => document.body.style.overflow), "hidden");
   await page.setViewportSize({ width: 390, height: 844 });
   const toggle = page.locator(".menu-toggle");
+  const menu = page.locator(".mobile-nav");
   await toggle.click();
-  assert.equal(await toggle.getAttribute("aria-expanded"), "true");
+  assert.equal(await menu.getAttribute("open"), "");
   await page.keyboard.press("Escape");
-  assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+  assert.equal(await menu.getAttribute("open"), null);
   assert.ok(await toggle.evaluate((e) => e === document.activeElement));
   await toggle.click();
   await page
@@ -140,12 +180,46 @@ try {
     .getByRole("link", { name: "Writing", exact: true })
     .click();
   await page.waitForURL("**/writing");
-  assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+  assert.equal(await menu.getAttribute("open"), null);
+  if (engine) {
+    const noScript = await engine.newPage({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    try {
+      await noScript.goto(base);
+      await noScript.locator(".menu-toggle").click();
+      await noScript.getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "Progress", exact: true }).click();
+      await noScript.waitForURL("**/progress");
+    } finally {
+      await noScript.close();
+    }
+  }
   if (preview) {
     await page.getByLabel("Find an essay or topic").fill("shorter");
     await page.getByRole("button", { name: "Search", exact: true }).click();
     await page.waitForURL("**/writing?q=shorter");
     assert.equal(await page.locator(".article-card").count(), 1);
+    assert.match(await page.getByRole("status").innerText(), /1 entry matching/);
+    await page.locator(".article-card .card-title").click();
+    await page.getByRole("link", { name: "Back to results" }).click();
+    await page.waitForURL("**/writing?q=shorter");
+    await page.getByRole("link", { name: "Clear filters" }).click();
+    await page.waitForURL("**/writing");
+    await page.waitForFunction(() => document.activeElement.id === "writing-search");
+    assert.equal(await page.getByRole("searchbox").inputValue(), "");
+    await page.goBack();
+    await page.waitForURL("**/writing?q=shorter");
+    assert.equal(await page.getByRole("searchbox").inputValue(), "shorter");
+    await page.setViewportSize({ width: 320, height: 844 });
+    await page.goto(base + "/writing?q=" + "x".repeat(150));
+    await layout("long query at 320px");
+    assert.ok(await page.getByRole("link", { name: "Clear filters" }).isVisible());
+    await page.goto(base + "/progress?category=unknown");
+    assert.ok(await page.locator(".progress-card").count());
+    const monthLinks = page.locator(".hours-list a");
+    assert.ok(await monthLinks.count());
+    const monthBox = await monthLinks.first().boundingBox();
+    assert.ok(monthBox.height >= 44 && monthBox.width >= 24);
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(base + "/writing/reading-specimen", { waitUntil: "load" });
     assert.equal(await page.locator(".prose strong").count(), 1);
     assert.ok(await page.locator(".prose em").count());
@@ -159,10 +233,14 @@ try {
         .locator(".table-scroll")
         .evaluate((e) => e.scrollWidth > e.clientWidth),
     );
+    // Below 64rem the table of contents is a collapsed <details>; open it first.
+    if (!(await page.locator(".toc details").evaluate((d) => d.open)))
+      await page.locator(".toc summary").click();
     await page
       .getByRole("navigation", { name: "On this page" })
       .getByRole("link", { name: "Follow the argument" })
       .click();
+    assert.equal(await page.locator(".toc details").evaluate((d) => d.open), false);
     await page.waitForTimeout(400);
     assert.ok(
       await page
@@ -202,7 +280,7 @@ try {
       for (const route of [
         "/",
         "/writing",
-        "/projects/personal-website",
+        projectRoute,
         ...(preview ? ["/writing/reading-specimen"] : []),
       ]) {
         await page.goto(base + route, { waitUntil: "load" });
@@ -240,7 +318,7 @@ try {
       for (const route of [
         "/",
         "/writing",
-        "/projects/personal-website",
+        projectRoute,
         ...(preview ? ["/writing/reading-specimen"] : []),
       ]) {
         await page.goto(base + route, { waitUntil: "load" });
@@ -255,7 +333,7 @@ try {
   for (const [width, height, name, route] of [
     [1440, 1000, "home-desktop", "/"],
     [390, 844, "home-mobile", "/"],
-    [1440, 1000, "project-desktop", "/projects/personal-website"],
+    [1440, 1000, "project-desktop", projectRoute],
     ...(preview
       ? [
           [1440, 1000, "article-desktop", "/writing/reading-specimen"],
@@ -270,6 +348,9 @@ try {
   // An actual missing slug must return 404, not an empty article with HTTP 200.
   const missing = await page.request.get(base + "/writing/not-a-real-entry");
   assert.equal(missing.status(), 404);
+  const unmatched = await page.request.get(base + "/unknown-portfolio-path");
+  assert.equal(unmatched.status(), 404);
+  assert.match(await unmatched.text(), /Back to the notebook/);
   assert.deepEqual(
     errors,
     [],

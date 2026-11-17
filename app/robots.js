@@ -1,9 +1,8 @@
-import { absoluteUrl, preview, hasPublicOrigin } from "@/lib/site";
+import { absoluteUrl, isPublicSite } from "@/lib/site";
 export default function robots() {
-  return preview || !hasPublicOrigin
-    ? { rules: { userAgent: "*", disallow: "/" } }
-    : {
-        rules: { userAgent: "*", allow: "/", disallow: "/studio" },
-        sitemap: absoluteUrl("/sitemap.xml"),
-      };
+  // Crawlers must be able to read the noindex metadata on previews and Studio.
+  return {
+    rules: { userAgent: "*", allow: "/" },
+    ...(isPublicSite ? { sitemap: absoluteUrl("/sitemap.xml") } : {}),
+  };
 }

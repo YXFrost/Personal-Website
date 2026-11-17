@@ -2,15 +2,14 @@
   {
     "_id": "local-personal-website",
     "_type": "project",
-    "title": "A home for ideas & things I build",
+    "title": "Building the YN notebook",
     "slug": {
       "current": "personal-website"
     },
-    "summary": "This website: a personal publication, project portfolio, and archive of learning. Built with Next.js and Sanity, and editable from a normal Git repository.",
+    "summary": "How I turned a monthly study archive into a home for essays, project notes, and study logs, with clearer navigation and shorter paths to the writing.",
     "technologies": ["Next.js", "React", "Sanity"],
     "status": "In progress",
     "publishedAt": "2026-09-20",
-    "featured": true,
     "coverImage": {
       "src": "/images/personal-website.png",
       "width": 1200,
@@ -41,7 +40,7 @@
           {
             "_type": "span",
             "_key": "overview-texts",
-            "text": "A personal website combining long-form writing, project documentation, and progress notes. The visual language keeps a near-black background, warm amber accents, and the feel of a technical notebook.",
+            "text": "The notebook grew out of a monthly study archive. That format was good for looking back over a month, but it gave an essay and a practical project the same place and presentation. I wanted each kind of work to be easier to recognize and find.",
             "marks": []
           }
         ]
@@ -55,7 +54,7 @@
           {
             "_type": "span",
             "_key": "motivations",
-            "text": "Motivation",
+            "text": "What I worked on",
             "marks": []
           }
         ]
@@ -69,7 +68,7 @@
           {
             "_type": "span",
             "_key": "motivation-texts",
-            "text": "A monthly update archive can record what happened, but writing and projects need space of their own. This site gives each kind of work a clear home, while keeping the learning archive close by.",
+            "text": "I set out to give the essays, projects, and study logs distinct homes while keeping the notebook personal. The homepage now leads to a piece of writing, and the Progress archive opens with the logs. The typography gives interface labels and long paragraphs different jobs.",
             "marks": []
           }
         ]
@@ -125,7 +124,7 @@
           {
             "_type": "span",
             "_key": "challenges-texts",
-            "text": "Long articles, wide code samples, and project screenshots need different layouts. Readable line lengths, contained scrolling, and image sizing let them share the same design system.",
+            "text": "The older essays and study logs were stored as projects. Reclassifying the pages without breaking links meant keeping the original records and their section anchors, then redirecting the old URLs. On smaller screens, the reading layout also needed to make the contents available before a large cover image.",
             "marks": []
           }
         ]
@@ -153,7 +152,7 @@
           {
             "_type": "span",
             "_key": "result-texts",
-            "text": "Writing, Projects, Progress, and About are separate sections. The site remains a regular source-code project that can be edited, committed, and deployed independently.",
+            "text": "A reader can now open the latest essay from the homepage, jump directly to a section on a phone, or find the monthly notes under Progress. The site has a shared reading layout and keeps the original URLs working through redirects.",
             "marks": []
           }
         ]

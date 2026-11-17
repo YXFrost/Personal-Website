@@ -1,64 +1,88 @@
 "use client";
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+
 const links = [
   ["/writing", "Writing"],
   ["/projects", "Projects"],
   ["/progress", "Progress"],
   ["/about", "About"],
 ];
+
+function NavigationLinks({ pathname, onClick }) {
+  return (
+    <ul className="nav-links">
+      {links.map(([href, label]) => (
+        <li key={href}>
+          <NavigationLink
+            href={href}
+            prefetch={pathname !== href}
+            onClick={onClick}
+            aria-current={pathname === href ? "page" : pathname.startsWith(href + "/") ? "location" : undefined}
+          >
+            {label}
+          </NavigationLink>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function Navbar() {
   const pathname = usePathname();
   return <Navigation key={pathname} pathname={pathname} />;
 }
+
 function Navigation({ pathname }) {
-  const [open, setOpen] = useState(false);
-  const button = useRef(null);
+  const header = useRef(null);
+  const mobile = useRef(null);
+  const toggle = useRef(null);
+
+  function closeMenu() {
+    if (mobile.current) mobile.current.open = false;
+  }
+
+  useEffect(() => {
+    mobile.current?.setAttribute("data-menu-enhanced", "");
+    const onPointerDown = (event) => {
+      if (mobile.current?.open && !header.current?.contains(event.target)) closeMenu();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, []);
+
   return (
     <header
+      ref={header}
       className="site-header"
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && open) {
-          setOpen(false);
-          button.current?.focus();
+      style={{ viewTransitionName: "site-header" }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && mobile.current?.open) {
+          closeMenu();
+          toggle.current?.focus();
         }
       }}
     >
       <nav className="container nav" aria-label="Main navigation">
-        <Link href="/" className="wordmark" aria-label="YN — homepage" onClick={() => setOpen(false)}>
+        <NavigationLink href="/" className="wordmark" aria-label="YN — homepage" onClick={closeMenu}>
           YN<span>.</span>
-        </Link>
-        <button
-          ref={button}
-          type="button"
-          className="menu-toggle"
-          aria-expanded={open}
-          aria-controls="main-navigation"
-          onClick={() => setOpen(!open)}
+        </NavigationLink>
+        <div className="desktop-nav">
+          <NavigationLinks pathname={pathname} />
+        </div>
+        <details
+          ref={mobile}
+          className="mobile-nav"
+          onBlur={(event) => {
+            if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) closeMenu();
+          }}
         >
-          {open ? "Close −" : "Menu +"}
-        </button>
-        <ul
-          id="main-navigation"
-          className={`nav-links ${open ? "is-open" : ""}`}
-        >
-          {links.map(([href, label]) => (
-            <li key={href}>
-              <Link
-                href={href}
-                onClick={() => setOpen(false)}
-                aria-current={
-                  pathname === href || pathname.startsWith(href + "/")
-                    ? "page"
-                    : undefined
-                }
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+          <summary ref={toggle} className="menu-toggle">
+            <span>Menu</span><span className="menu-indicator" aria-hidden="true" />
+          </summary>
+          <NavigationLinks pathname={pathname} onClick={closeMenu} />
+        </details>
       </nav>
     </header>
   );

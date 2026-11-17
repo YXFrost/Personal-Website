@@ -1,29 +1,38 @@
-import Link from "next/link";
+import NavigationLink from "./NavigationLink";
 import { site } from "@/lib/site";
-import { formatDate } from "@/lib/utils.mjs";
-export default function HeroSection() {
+import { entryPath, formatDate } from "@/lib/utils.mjs";
+import PointerGlow from "./PointerGlow";
+
+const sections = [
+  ["projects", "Projects"],
+  ["writing", "Writing"],
+  ["study-logs", "Study logs"],
+];
+
+export default function HeroSection({ lead }) {
   const current = Object.entries(site.currently || {}).filter(
     ([key, value]) => key !== "updated" && value,
   );
   return (
     <section className="hero" id="home">
+      <div className="hero-backdrop" aria-hidden="true">
+        <div className="hero-grid-paper" />
+        <div className="hero-contours" />
+      </div>
+      <PointerGlow />
       <div className="container hero-grid">
         <div>
-          <p className="eyebrow">A personal notebook / {site.name}</p>
           <h1>
-            I learn by
-            <br />
-            <em>building.</em>
+            <span className="hero-line"><span>I learn by</span></span>{" "}
+            <span className="hero-line hero-line-accent"><span>building.</span></span>
           </h1>
-          <p className="hero-subtitle">Studying, writing & making things.</p>
           <p className="hero-description">{site.description}</p>
           <div className="actions">
-            <Link className="button" href="/writing">
-              Explore the writing <span aria-hidden="true">↗</span>
-            </Link>
-            <Link className="text-link" href="/projects">
-              See what I’m building <span aria-hidden="true">→</span>
-            </Link>
+            <NavigationLink className="button" href={lead ? entryPath(lead) : "/about"} prefetch aria-describedby={lead ? "hero-entry" : undefined}>
+              {lead?._type === "writing" ? "Read the latest essay" : lead ? "Read the latest entry" : "About the notebook"}
+              <span aria-hidden="true">→</span>
+            </NavigationLink>
+            {lead && <p className="hero-entry" id="hero-entry">{lead.title}</p>}
           </div>
         </div>
         <aside className="currently" aria-labelledby="currently-title">
@@ -49,10 +58,18 @@ export default function HeroSection() {
           )}
         </aside>
       </div>
-      <div className="container hero-foot">
-        <span>Curiosity, with a paper trail.</span>
-        <span aria-hidden="true">↓</span>
-      </div>
+      <nav className="container home-index" aria-label="On this page">
+        <ul>
+          {sections.map(([id, label]) => (
+            <li key={id}>
+              <a href={`#${id}`}>
+                {label}
+                <span aria-hidden="true">↓</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </section>
   );
 }

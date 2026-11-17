@@ -1,7 +1,10 @@
 import "./globals.css";
+import "./masthead-art.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { site, siteUrl, preview, hasPublicOrigin } from "@/lib/site";
+import PageTransition from "@/components/PageTransition";
+import RevealObserver from "@/components/RevealObserver";
+import { site, siteUrl, preview, isPublicSite } from "@/lib/site";
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -9,11 +12,8 @@ export const metadata = {
     template: `%s | ${site.name}`,
   },
   description: site.description,
-  alternates: { types: { "application/rss+xml": "/feed.xml" } },
   robots:
-    preview || !hasPublicOrigin
-      ? { index: false, follow: false }
-      : { index: true, follow: true },
+    isPublicSite ? { index: true, follow: true } : { index: false, follow: false },
 };
 export const viewport = {
   width: "device-width",
@@ -22,7 +22,9 @@ export const viewport = {
 };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    // Extensions (password managers, translators) add attributes to <html> before
+    // hydration. This only ignores attribute differences on this one element.
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <a className="skip-link" href="#main-content">
           Skip to content
@@ -35,9 +37,10 @@ export default function RootLayout({ children }) {
           </aside>
         )}
         <main id="main-content" tabIndex={-1}>
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
+        <RevealObserver />
       </body>
     </html>
   );
