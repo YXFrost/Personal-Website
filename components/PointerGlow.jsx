@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useRef } from "react";
-export default function HeroGlow() {
+export default function PointerGlow() {
   const glow = useRef(null);
   useEffect(() => {
     const el = glow.current;
-    const hero = el?.parentElement;
-    if (!hero) return;
+    const surface = el?.parentElement;
+    if (!surface) return;
 
     const motion = matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)");
     let frame = 0;
@@ -14,7 +14,7 @@ export default function HeroGlow() {
 
     function paint() {
       frame = 0;
-      const rect = hero.getBoundingClientRect();
+      const rect = surface.getBoundingClientRect();
       const x = cursor.x - rect.left;
       const y = cursor.y - rect.top;
       if (!position) {
@@ -43,15 +43,15 @@ export default function HeroGlow() {
       el.dataset.active = "false";
     }
 
-    hero.addEventListener("pointermove", move);
-    hero.addEventListener("pointerleave", leave);
+    surface.addEventListener("pointermove", move, { passive: true });
+    surface.addEventListener("pointerleave", leave);
     motion.addEventListener("change", leave);
     return () => {
       cancelAnimationFrame(frame);
-      hero.removeEventListener("pointermove", move);
-      hero.removeEventListener("pointerleave", leave);
+      surface.removeEventListener("pointermove", move);
+      surface.removeEventListener("pointerleave", leave);
       motion.removeEventListener("change", leave);
     };
   }, []);
-  return <div ref={glow} className="hero-glow" aria-hidden="true" />;
+  return <div ref={glow} className="pointer-glow" aria-hidden="true" />;
 }

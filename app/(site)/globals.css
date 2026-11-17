@@ -1935,7 +1935,7 @@ figcaption {
       interactivity: inert;
     }
     @media (prefers-reduced-motion: no-preference) {
-      .mobile-nav::details-content {
+      .mobile-nav[data-menu-enhanced]::details-content {
         transition:
           opacity 180ms ease-out,
           translate 180ms var(--ease-out),

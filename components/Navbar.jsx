@@ -44,6 +44,7 @@ function Navigation({ pathname }) {
   }
 
   useEffect(() => {
+    mobile.current?.setAttribute("data-menu-enhanced", "");
     const onPointerDown = (event) => {
       if (mobile.current?.open && !header.current?.contains(event.target)) closeMenu();
     };
@@ -73,12 +74,8 @@ function Navigation({ pathname }) {
         <details
           ref={mobile}
           className="mobile-nav"
-          onToggle={(event) => {
-            const menu = event.currentTarget;
-            menu.toggleAttribute("data-motion", menu.open);
-          }}
           onBlur={(event) => {
-            if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
+            if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) closeMenu();
           }}
         >
           <summary ref={toggle} className="menu-toggle">

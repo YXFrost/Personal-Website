@@ -1,7 +1,7 @@
 import NavigationLink from "./NavigationLink";
 import { site } from "@/lib/site";
 import { entryPath, formatDate } from "@/lib/utils.mjs";
-import HeroGlow from "./HeroGlow";
+import PointerGlow from "./PointerGlow";
 
 const sections = [
   ["projects", "Projects"],
@@ -19,7 +19,7 @@ export default function HeroSection({ lead }) {
         <div className="hero-grid-paper" />
         <div className="hero-contours" />
       </div>
-      <HeroGlow />
+      <PointerGlow />
       <div className="container hero-grid">
         <div>
           <h1>
